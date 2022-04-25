@@ -38,3 +38,20 @@ def load_data_for_split(questions_path, questions_feature_name, answers_path=Non
                     choice = rand.choice(available_answers)
                     result[answers_feature_name].append(choice)
     return Dataset.from_dict(result)
+
+
+def write_data_to_tsv(path, data):
+    with open(path, 'w') as tsv_file:
+        lines = [f'{line}\n' for line in data]
+        tsv_file.writelines(lines)
+
+
+def write_results_to_tsv(results_base_path, questions, answers, expected):
+    if not os.path.exists(results_base_path):
+        os.mkdir(results_base_path)
+
+    in_path = os.path.join(results_base_path, 'in.tsv')
+    out_path = os.path.join(results_base_path, 'out.tsv')
+    expected_path = os.path.join(results_base_path, 'expected.tsv')
+    for path, data in zip([in_path, out_path, expected_path], [questions, answers, expected]):
+        write_data_to_tsv(path, data)
