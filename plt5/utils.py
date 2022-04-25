@@ -1,4 +1,3 @@
-import torch
 
 
 def get_t5_tokenizer_function(tokenizer, question_max_len=50, answer_max_len=10):
@@ -11,24 +10,3 @@ def get_t5_tokenizer_function(tokenizer, question_max_len=50, answer_max_len=10)
             model_inputs['labels'] = labels_ids
         return model_inputs
     return tokenize_function
-
-
-def get_answered_questions(dataset, model, tokenizer, batch_size=50, max_len=None):
-    start = 0
-    outputs = []
-    questions = []
-    expected = []
-    while start < len(dataset['input_ids']):
-        end = start + batch_size
-        batch = dataset['input_ids'][start:end]
-        if max_len is None:
-            batch_outs = model.generate(input_ids=torch.tensor(batch))
-        else:
-            batch_outs = model.generate(input_ids=torch.tensor(batch), max_length=max_len)
-        decoded = [tokenizer.decode(item, skip_special_tokens=True) for item in batch_outs]
-        outputs.extend(decoded)
-        questions.extend(dataset['question'][start:end])
-        if 'answer' in dataset:
-            expected.extend(dataset['answer'][start:end])
-        start = end
-    return outputs, questions, expected

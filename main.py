@@ -24,6 +24,8 @@ if __name__ == '__main__':
     parser.add_argument('--test-batch-size', default=50, type=int)
     parser.add_argument('--test-max-length', default=None, type=int, help='max length necessary to create a pytorch tensor during testing')
     parser.add_argument('--results-dir', default='data-results')
+    parser.add_argument('-s', '--save-pretrained', action='store_true')
+    parser.add_argument('-S', '--skip-training', action='store_true')
     
     args = parser.parse_args()
     main(args)

@@ -1,8 +1,25 @@
 import os
 import random
+import torch
 from datasets import Dataset, DatasetDict
 
 
+def info_message(message):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            print(f'{message}...')
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
+@info_message('Saving the model')
+def save_trained_model(args, model):
+    target_dir = os.path.join('.', args.model_name, args.revision, 'trained-model')
+    model.save_pretrained(target_dir)
+
+
+@info_message('Loading all data from the specified location')
 def load_datasets(extension='tsv', **dataset_paths):
     result_dict = {}
     for dataset_key, dataset_base_dir in dataset_paths.items():
@@ -46,6 +63,7 @@ def write_data_to_tsv(path, data):
         tsv_file.writelines(lines)
 
 
+@info_message('Writing model testing results')
 def write_results_to_tsv(results_base_path, questions, answers, expected):
     if not os.path.exists(results_base_path):
         os.mkdir(results_base_path)
@@ -55,3 +73,26 @@ def write_results_to_tsv(results_base_path, questions, answers, expected):
     expected_path = os.path.join(results_base_path, 'expected.tsv')
     for path, data in zip([in_path, out_path, expected_path], [questions, answers, expected]):
         write_data_to_tsv(path, data)
+
+
+@info_message('Testing model')
+def get_answered_questions(dataset, model, tokenizer, batch_size=50, max_len=None):
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    start = 0
+    outputs = []
+    questions = []
+    expected = []
+    while start < len(dataset['input_ids']):
+        end = start + batch_size
+        batch = dataset['input_ids'][start:end]
+        if max_len is None:
+            batch_outs = model.generate(input_ids=torch.tensor(batch, device=device))
+        else:
+            batch_outs = model.generate(input_ids=torch.tensor(batch), max_length=max_len, device=device)
+        decoded = [tokenizer.decode(item, skip_special_tokens=True) for item in batch_outs]
+        outputs.extend(decoded)
+        questions.extend(dataset['question'][start:end])
+        if 'answer' in dataset.features:
+            expected.extend(dataset['answer'][start:end])
+        start = end
+    return outputs, questions, expected

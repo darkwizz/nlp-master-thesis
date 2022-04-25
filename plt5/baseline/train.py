@@ -1,5 +1,5 @@
-from utils import load_datasets, write_results_to_tsv
-from plt5.utils import get_t5_tokenizer_function, get_answered_questions
+from utils import load_datasets, write_results_to_tsv, get_answered_questions, save_trained_model
+from plt5.utils import get_t5_tokenizer_function
 from transformers import T5Tokenizer, DataCollatorForSeq2Seq, \
                          T5ForConditionalGeneration, Seq2SeqTrainingArguments, Seq2SeqTrainer
 
@@ -44,7 +44,8 @@ def main(parsed_args):
         tokenizer=tokenizer,
         data_collator=data_collator,
     )
-    # trainer.train()
+    if not parsed_args.skip_training:
+        trainer.train()
 
     test_batch_size = parsed_args.test_batch_size
     test_max_len = parsed_args.test_max_length
@@ -52,3 +53,6 @@ def main(parsed_args):
                                             tokenizer, test_batch_size, test_max_len)
     results_base_path = f'./{parsed_args.model_name}/{parsed_args.revision}/{parsed_args.results_dir}'
     write_results_to_tsv(results_base_path, questions, answers, expected)
+
+    if parsed_args.save_pretrained:
+        save_trained_model(parsed_args, model)
