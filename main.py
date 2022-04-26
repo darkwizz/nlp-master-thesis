@@ -26,6 +26,7 @@ if __name__ == '__main__':
     parser.add_argument('--results-dir', default='data-results')
     parser.add_argument('-s', '--save-pretrained', action='store_true')
     parser.add_argument('-S', '--skip-training', action='store_true')
+    parser.add_argument('-f', '--few-shot', action='store_true', help='for decoder-based models performs testing in a few-shot way')
     
     args = parser.parse_args()
     main(args)

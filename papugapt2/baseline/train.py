@@ -1,6 +1,22 @@
 from utils import load_datasets, write_results_to_tsv, get_answered_questions, save_trained_model
-from papugapt2.utils import get_gpt2_tokenizer_function
-from transformers import AutoTokenizer, AutoModelWithLMHead, DataCollatorForLanguageModeling, TrainingArguments, Trainer
+from papugapt2.utils import get_gpt2_tokenizer_function, get_divided_datasets, get_gpt2_few_shot_prompts, \
+                            get_few_shot_answers
+from transformers import AutoTokenizer, AutoModelWithLMHead, DataCollatorForLanguageModeling, \
+                         TrainingArguments, Trainer, pipeline
+
+
+def test_model_few_shot(args, model, tokenizer, dataset):
+    main_dataset, few_shot = get_divided_datasets(dataset)
+    few_shot_prompts = get_gpt2_few_shot_prompts(main_dataset['question'], few_shot)
+    generator = pipeline('text-generation', model=model, tokenizer=tokenizer)
+    test_max_length = args.answer_max_length or 10
+    test_batch_size = args.test_batch_size
+    answers = get_few_shot_answers(few_shot_prompts, generator, max_new_tokens=test_max_length, batch_size=test_batch_size)
+    questions = main_dataset['question']
+    expected = []
+    if 'answer' in main_dataset.features:
+        expected = main_dataset['answer']
+    return answers, questions, expected
 
 
 def main(parsed_args):
@@ -42,12 +58,22 @@ def main(parsed_args):
     )
     if not parsed_args.skip_training:
         trainer.train()
+    
+    if not parsed_args.few_shot:
+        test_batch_size = parsed_args.test_batch_size
+        test_max_len = parsed_args.test_max_length
+        answers, questions, expected = get_answered_questions(tokenized_data['test_A'], model, tokenizer, test_batch_size, test_max_len)
 
-    test_batch_size = parsed_args.test_batch_size
-    test_max_len = parsed_args.test_max_length
-    answers, questions, expected = get_answered_questions(tokenized_data['test_A'], model, tokenizer, test_batch_size, test_max_len)
-    results_base_path = f'./{parsed_args.model_name}/{parsed_args.revision}/{parsed_args.results_dir}'
+        formatted_answers = []
+        for generated in answers:
+            answer = generated.split('Odpowiedź: ')[1]
+            formatted_answers.append(answer)
+        answers = formatted_answers
+    else:
+        answers, questions, expected = test_model_few_shot(parsed_args, model, tokenizer, tokenized_data['test_A'])
+    few_shot_txt = '-few-shot' if parsed_args.few_shot else ''
+    results_base_path = f'./{parsed_args.model_name}/{parsed_args.revision}/{parsed_args.results_dir}{few_shot_txt}'
     write_results_to_tsv(results_base_path, questions, answers, expected)
 
     if parsed_args.save_pretrained:
-        save_trained_model
+        save_trained_model(parsed_args, model)
