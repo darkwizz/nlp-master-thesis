@@ -14,7 +14,7 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('-n', '--model_name', choices=('plt5', 'papugapt2'), type=str.lower,
                         help='a model name to use', required=True)
-    parser.add_argument('-r', '--revision', choices=('baseline'), type=str.lower, required=True, help="model revision")
+    parser.add_argument('-r', '--revision', choices=('baseline',), type=str.lower, required=True, help="model revision")
     parser.add_argument('-b', '--base-data-path', required=True, help='base path to all data')
     parser.add_argument('-t', '--tokenizer-path', required=True)
     parser.add_argument('-m', '--model-path', required=True)
