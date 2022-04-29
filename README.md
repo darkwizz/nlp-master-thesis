@@ -7,7 +7,11 @@ Artur Sokol
 
 
 ### Briefly about the problem
-[TODO]
+Closed-book Question Answering means that a trained model in order to answer on a question does not need any provided context - it uses its own knowledge:
+
+| ![OpenBookQA](./resources/open-book-QA.png) | ![CloseBookQA](./resources/close-book-QA.png) |
+| :----: | :----: |
+| Open-book QA | Closed-book QA |
 
 
 ### General help
@@ -62,3 +66,11 @@ python main.py -S -n papugapt2 -r baseline -q 45 -a 10 -b data -t dkleczek/papuG
 
 ### Results
 For results description (metrics, generated data by models) go to README.md under respective model names.
+
+
+### Evaluation
+For this purpose [geval](https://gitlab.com/filipg/geval) is used, because the testing data is taken from [PolEval-2021 task 4](https://github.com/poleval/2021-question-answering/tree/secret), where geval was used for evaluation. Moreover the tool is easy to use and it has a lot of different supported metrics:
+
+```
+$ ./geval --list-metrics  # outputs the complete list of available metrics and their description
+```

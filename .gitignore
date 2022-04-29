@@ -130,5 +130,4 @@ dmypy.json
 
 
 # other stuff
-results/
-data-results/
+*results/
