@@ -59,7 +59,7 @@ def load_data_for_split(questions_path, questions_feature_name, answers_path=Non
 
 def write_data_to_tsv(path, data):
     with open(path, 'w') as tsv_file:
-        lines = [f'{line}\n' for line in data]
+        lines = [f'{line.replace("\n", "").strip()}\n' for line in data]
         tsv_file.writelines(lines)
 
 

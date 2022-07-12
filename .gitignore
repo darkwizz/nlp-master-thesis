@@ -131,3 +131,5 @@ dmypy.json
 
 # other stuff
 *results/
+.vscode
+run-gpt3-demo.sh
