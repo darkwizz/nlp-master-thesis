@@ -9,9 +9,11 @@ Artur Sokol
 ### Briefly about the problem
 Closed-book Question Answering means that a trained model in order to answer on a question does not need any provided context - it uses its own knowledge:
 
-| ![OpenBookQA](./resources/open-book-QA.png) | ![CloseBookQA](./resources/close-book-QA.png) |
+| ![MachineReadingComprehension](./resources/open-book-QA.png) | ![CloseBookQA](./resources/close-book-QA.png) |
 | :----: | :----: |
-| Open-book QA | Closed-book QA |
+| Machine Reading Comprehension (MRC) | Closed-book QA |
+
+On the contrary, Open-book QA uses an external source of knowledge (e.g. a DB of Wikipedia articles in raw format). In this case an Open-book QA model searches for _k_ best matching documents and then uses MRC to extract the answer
 
 
 ### General help
@@ -24,7 +26,7 @@ usage: main.py [-h] -n {plt5,papugapt2} -r {baseline} -b BASE_DATA_PATH -t TOKEN
 optional arguments:
   -h, --help            show this help message and exit
   -n {plt5,papugapt2}, --model_name {plt5,papugapt2}
-                        a model name to use. In this master thesis most likely T5 and GPT2 will be considered
+                        a model name to use. In this master thesis most likely T5 and GPT2 only will be considered
   -r {baseline}, --revision {baseline}
                         model revision, the names might be weird as they should follow Python naming conventions
   -b BASE_DATA_PATH, --base-data-path BASE_DATA_PATH
@@ -53,6 +55,13 @@ optional arguments:
   -f, --few-shot        for decoder-based models performs testing in a few-shot way. If set for a model name/revision which does not have implemented few-shot, then the flag is just ignored
 ```
 
+### Note about the environment
+When running plT5 one more library should be installed:
+```bash
+$ pip install sentencepiece
+```
+
+
 ### Examples
 
 for plT5:
@@ -69,8 +78,9 @@ For results description (metrics, generated data by models) go to README.md unde
 
 
 ### Evaluation
-For this purpose [geval](https://gitlab.com/filipg/geval) is used, because the testing data is taken from [PolEval-2021 task 4](https://github.com/poleval/2021-question-answering/tree/secret), where geval was used for evaluation. Moreover the tool is easy to use and it has a lot of different supported metrics:
+For this purpose [geval](https://gitlab.com/filipg/geval) is used, because the testing data is taken from [PolEval-2021 task 4](https://github.com/poleval/2021-question-answering/tree/secret), where geval was used for evaluation. Moreover the tool is easy to use and it has a lot of different supported metrics.
 
-```
+```bash
 $ ./geval --list-metrics  # outputs the complete list of available metrics and their description
+$ ./geval -t <path-to-results-dir> --metric GLEU --metric Accuracy [--metric ...]  # evaluate results
 ```
