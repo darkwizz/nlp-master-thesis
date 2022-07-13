@@ -83,4 +83,5 @@ For this purpose [geval](https://gitlab.com/filipg/geval) is used, because the t
 ```bash
 $ ./geval --list-metrics  # outputs the complete list of available metrics and their description
 $ ./geval -t <path-to-results-dir> --metric GLEU --metric Accuracy [--metric ...]  # evaluate results
+$ ./geval -t <path-to-results-dir> --alt-metric <metric> --line-by-line --reverse-sort | less  # inspect every actual-expected pair sorted by the most accurate
 ```
