@@ -1,4 +1,4 @@
-from utils import load_datasets, write_results_to_tsv, get_answered_questions, save_trained_model
+from utils.workflow import load_datasets, write_results_to_tsv, get_answered_questions, save_trained_model
 from plt5.utils import get_t5_tokenizer_function
 from transformers import T5Tokenizer, DataCollatorForSeq2Seq, \
                          T5ForConditionalGeneration, Seq2SeqTrainingArguments, Seq2SeqTrainer

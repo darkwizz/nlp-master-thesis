@@ -1,4 +1,4 @@
-from utils import load_datasets, write_results_to_tsv, get_answered_questions, save_trained_model
+from utils.workflow import load_datasets, write_results_to_tsv, get_answered_questions, save_trained_model
 from papugapt2.utils import get_gpt2_tokenizer_function, get_divided_datasets, get_gpt2_few_shot_prompts, \
                             get_few_shot_answers
 from transformers import AutoTokenizer, AutoModelWithLMHead, DataCollatorForLanguageModeling, \

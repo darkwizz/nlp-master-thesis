@@ -20,15 +20,15 @@ def save_trained_model(args, model):
 
 
 @info_message('Loading all data from the specified location')
-def load_datasets(extension='tsv', **dataset_paths):
+def load_datasets(extension='tsv', seed=93682, **dataset_paths):
     result_dict = {}
     for dataset_key, dataset_base_dir in dataset_paths.items():
         questions_path = os.path.join(dataset_base_dir, f'in.{extension}')
         answers_path = os.path.join(dataset_base_dir, f'expected.{extension}')
         if not os.path.exists(answers_path):
-            dataset = load_data_for_split(questions_path, 'question')
+            dataset = load_data_for_split(questions_path, 'question', seed=seed)
         else:
-            dataset = load_data_for_split(questions_path, 'question', answers_path, 'answer')
+            dataset = load_data_for_split(questions_path, 'question', answers_path, 'answer', seed=seed)
         result_dict[dataset_key] = dataset
     result = DatasetDict(result_dict)
     return result
@@ -59,7 +59,7 @@ def load_data_for_split(questions_path, questions_feature_name, answers_path=Non
 
 def write_data_to_tsv(path, data):
     with open(path, 'w') as tsv_file:
-        lines = [f'{line.replace("\n", "").strip()}\n' for line in data]
+        lines = [line.replace("\n", "").strip() + '\n' for line in data]
         tsv_file.writelines(lines)
 
 

@@ -1,6 +1,6 @@
 from datasets import Dataset
 import numpy as np
-from utils import info_message
+from utils.workflow import info_message
 
 
 def get_gpt2_tokenizer_function(tokenizer, max_question_len=45, max_answer_len=10):
