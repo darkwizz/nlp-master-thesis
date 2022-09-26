@@ -3,7 +3,7 @@ from time import sleep
 import openai
 import tqdm
 
-from utils import load_datasets, write_results_to_tsv, info_message
+from utils.workflow import load_datasets, write_results_to_tsv, info_message
 
 
 @info_message('Answering question using GPT3')

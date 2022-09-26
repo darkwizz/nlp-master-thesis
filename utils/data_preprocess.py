@@ -21,4 +21,15 @@ def living_entity_filter(data_item):
 
 
 def named_entity_filter(data_item):
-    return bool(_pl_nlp(data_item['answer']).ents)
+    return bool(_pl_nlp(data_item['answer'], disable=["tok2vec", "tagger", "parser", "attribute_ruler", "lemmatizer"]).ents)
+
+
+def numeric_entity_filter(data_item):
+    ans_tokens = _pl_nlp(data_item['answer'], disable=["tok2vec", "tagger", "parser", "attribute_ruler", "lemmatizer"])
+    like_number = ans_tokens[0].like_num
+    for alt in data_item['alternatives']:
+        if like_number:
+            break
+        ans_tokens = _pl_nlp(alt, disable=["tok2vec", "tagger", "parser", "attribute_ruler", "lemmatizer"])
+        like_number = ans_tokens[0].like_num
+    return like_number

@@ -38,7 +38,8 @@ def load_data_for_split(questions_path, questions_feature_name, answers_path=Non
                         answers_feature_name=None, sep='\t', seed=25462):
     rand = random.Random(x=seed)
     result = {
-        questions_feature_name: []
+        questions_feature_name: [],
+        'alternatives': []
     }
     with open(questions_path) as questions_file:
         for line in questions_file:
@@ -51,9 +52,14 @@ def load_data_for_split(questions_path, questions_feature_name, answers_path=Non
         with open(answers_path) as answers_file:
             for line in answers_file:
                 available_answers = line.strip().split(sep)
+                alternatives = []
                 if available_answers:
-                    choice = rand.choice(available_answers)
+                    answer_position = rand.randint(0, len(available_answers) - 1)
+                    choice = available_answers[answer_position]
                     result[answers_feature_name].append(choice)
+                    for i in list(range(answer_position)) + list(range(answer_position + 1, len(available_answers))):
+                        alternatives.append(available_answers[i])
+                    result['alternatives'].append(alternatives)
     return Dataset.from_dict(result)
 
 
