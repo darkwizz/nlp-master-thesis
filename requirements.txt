@@ -29,7 +29,7 @@ huggingface-hub==0.5.1
 idna==2.8
 ipaddr==2.2.0
 Jinja2==3.1.2
-joblib==1.1.0
+joblib==1.2.0
 kiwisolver==1.4.4
 langcodes==3.3.0
 lockfile==0.12.2
