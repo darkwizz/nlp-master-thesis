@@ -85,3 +85,27 @@ $ ./geval --list-metrics  # outputs the complete list of available metrics and t
 $ ./geval -t <path-to-results-dir> --metric GLEU --metric Accuracy [--metric ...]  # evaluate results
 $ ./geval -t <path-to-results-dir> --alt-metric <metric> --line-by-line --reverse-sort | less  # inspect every actual-expected pair sorted by the most accurate
 ```
+
+
+## Utilities
+
+### Grouping PolEval questions using filters
+Currently, there have been implemented seven filters for PolEval questions which are aimed to help with preprocessing (specifically, natural language _prompting_). The original distribution suggested by the authors of the dataset is very unbalanced, which can cause difficulties during training and make a trained model biased towards specific questions categories.
+
+![The original PolEval 2021 training questions distribution](./resources/poleval_train_distrib.png)
+
+The implemented filters do not completely solve the problem, but now the disbalance is not so abrupt.
+
+![The distribution which can be obtained by applying the implemented filters](./resources/train_subsets_dist.png)
+
+Some of the filters are **overlapping**, which means that when calling suggested `split_data_by_filters()` function, the order of passing the filters as key args does affect the final distribution. Another thing which causes this behaviour is that each new filter is applied only to the unfiltered part of the data. An example of how to use the grouping function and `plot_questions_distribution_into_file()` function:
+
+```py
+from utils import plot_questions_distribution_into_file
+from utils import data_preprocess as prep
+
+split_subsets = prep.split_data_by_filters(data, fill_gap=prep.fill_gap_filter, boolean=prep.boolean_filter, mchoice=prep.multiple_choice_filter, named_living=prep.living_entity_filter, named_entity=prep.named_entity_filter, numeric=prep.
+numeric_entity_filter, proper_noun=prep.propn_filter)
+
+plot_questions_distribution_into_file(split_subsets, prep.QUESTION_TYPES, 'train_subsets_dist.png')
+```
