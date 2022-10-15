@@ -1,11 +1,13 @@
 import os
 import random
 import torch
+from functools import wraps
 from datasets import Dataset, DatasetDict
 
 
 def info_message(message):
     def decorator(func):
+        @wraps(func)
         def wrapper(*args, **kwargs):
             print(f'{message}...')
             return func(*args, **kwargs)

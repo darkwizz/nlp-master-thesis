@@ -1,32 +1,33 @@
-import spacy
+import numpy as np
 
+POLEVAL_QUESTION_TYPES = ['Gap filling', 'Yes/no', 'Multiple choice', 'Living named entity', 'Named entity', 'Numeric', 'Proper noun', 'Rest']
 
-_pl_nlp = spacy.load('pl_core_news_lg')
-
-QUESTION_TYPES = ['Gap filling', 'Yes/no', 'Multiple choice', 'Living named entity',
-
-'Named entity', 'Numeric', 'Proper noun', 'Rest']
-QUESTION_PROMPTS = {
-    QUESTION_TYPES[0]: ['Proszę uzupełnić lukę: |&|'],
-    QUESTION_TYPES[1]: ['Proszę podać odpowiedź "tak" czy "nie": |&|'],
-    QUESTION_TYPES[2]: ['Proszę wybrać poprawną opcję z kilku podanych: |&|', 'Zastanawiam się nad tym, którą odpowiedź z podanych jest poprawną. Proszę pomóc z pytaniem: |&|'],
-    QUESTION_TYPES[3]: ['Dane pytanie jest o żywym podmiocie. Proszę powiedzieć, |&|'],
-    QUESTION_TYPES[4]: ['To pytanie jest po prostu o podmiocie nazwanym. Proszę powiedzieć, |&|'],
-    QUESTION_TYPES[5]: ['Prosze podać liczbę: |&|', 'W tym pytaniu odpowiedź zawiera liczbę. Proszę powiedzieć, |&|'],
-    QUESTION_TYPES[6]: ['W odpowiedzi na dane pytanie jest nazwa własna. Proszę powiedzieć: |&|'],
-    QUESTION_TYPES[7]: ['Proszę odpowiedzieć na pytanie niżej: |&|', 'Zawsze zastanawiałem się: |&|', 'Jaka jest odpowiedź na następujące pytanie: |&|', 'Jest pytanie: |&|']
+PL_QUESTION_PROMPTS = {
+    POLEVAL_QUESTION_TYPES[0]: ['Proszę uzupełnić lukę: |&|'],
+    POLEVAL_QUESTION_TYPES[1]: ['Proszę podać odpowiedź "tak" czy "nie": |&|'],
+    POLEVAL_QUESTION_TYPES[2]: ['Proszę wybrać poprawną opcję z kilku podanych: |&|', 'Zastanawiam się nad tym, którą odpowiedź z podanych jest poprawną. Proszę pomóc z pytaniem: |&|'],
+    POLEVAL_QUESTION_TYPES[3]: ['Dane pytanie jest o żywym podmiocie. Proszę powiedzieć, |&|'],
+    POLEVAL_QUESTION_TYPES[4]: ['To pytanie jest po prostu o podmiocie nazwanym. Proszę powiedzieć, |&|'],
+    POLEVAL_QUESTION_TYPES[5]: ['Prosze podać liczbę: |&|', 'W tym pytaniu odpowiedź zawiera liczbę. Proszę powiedzieć, |&|'],
+    POLEVAL_QUESTION_TYPES[6]: ['W odpowiedzi na dane pytanie jest nazwa własna. Proszę powiedzieć: |&|'],
+    POLEVAL_QUESTION_TYPES[7]: ['Proszę odpowiedzieć na pytanie niżej: |&|', 'Zawsze zastanawiałem się: |&|', 'Jaka jest odpowiedź na następujące pytanie: |&|', 'Jest pytanie: |&|']
 }
 
-ANSWER_PROMPTS = [
+PL_ANSWER_PROMPTS = [
     'Odpowiedź na dane pytanie to |&|',
     'Poprawna odpowiedź: |&|',
-    'Proszę podać odpowiedź: |&|'
+    'Proszę podać odpowiedź: |&|',
+    'Odpowiedzią na to pytanie jest |&|'
 ]
 
 QUESTION_PREFIX = '<QUESTION>'
 QUESTION_SUFFIX = '</QUESTION>'
 ANSWER_PREFIX = '<ANSWER>'
 ANSWER_SUFFIX = '</ANSWER>'
+PL_QUESTION_PREFIX = '<PYTANIE>'
+PL_QUESTION_SUFFIX = '</PYTANIE>'
+PL_ANSWER_PREFIX = '<ODPOWIEDŹ>'
+PL_ANSWER_SUFFIX = '</ODPOWIEDŹ>'
 
 
 def split_data_by_filters(data, **filters):
@@ -44,40 +45,23 @@ def split_data_by_filters(data, **filters):
     return result
 
 
-def fill_gap_filter(data_item):
-    return '...' in data_item['question']
+def get_prompt_augmented_question(question, prompts, placeholder='|&|', seed=7343):
+    rs = np.random.RandomState(seed=seed)
+    prompt = rs.choice(prompts)
+    result = prompt.replace(placeholder, question)
+    return result
 
 
-def boolean_filter(data_item):
-    return 'Czy ' in data_item['question'] and ' czy ' not in data_item['question']
+def get_artificially_augmented_question(question, prefix=QUESTION_PREFIX, suffix=QUESTION_SUFFIX):
+    return f'{prefix}{question}{suffix}'
 
 
-def multiple_choice_filter(data_item):
-    return ' czy ' in data_item['question']
+def get_prompt_augmented_answer(answer, prompts, placeholder='|&|', seed=1362):
+    rs = np.random.RandomState(seed=seed)
+    prompt = rs.choice(prompts)
+    result = prompt.replace(placeholder, answer)
+    return result
 
 
-def living_entity_filter(data_item):
-    return data_item['question'].startswith('Kto ') or ' kto jest' in data_item['question']
-
-
-def named_entity_filter(data_item):
-    return bool(_pl_nlp(data_item['answer'], disable=["tok2vec", "tagger", "parser", "attribute_ruler", "lemmatizer"]).ents)
-
-
-def numeric_entity_filter(data_item):
-    ans_tokens = _pl_nlp(data_item['answer'], disable=["tok2vec", "tagger", "parser", "attribute_ruler", "lemmatizer"])
-    like_number = ans_tokens[0].like_num
-    for alt in data_item['alternatives']:
-        if like_number:
-            break
-        ans_tokens = _pl_nlp(alt, disable=["tok2vec", "tagger", "parser", "attribute_ruler", "lemmatizer"])
-        like_number = ans_tokens[0].like_num
-    return like_number
-
-
-def propn_filter(data_item):
-    doc = _pl_nlp(data_item['answer'], disable=["tagger", "parser", "lemmatizer"])
-    for token in doc:
-        if token.pos_ == 'PROPN':
-            return True
-    return False
+def get_artificially_augmented_answer(answer, prefix=ANSWER_PREFIX, suffix=ANSWER_SUFFIX):
+    return f'{prefix}{answer}{suffix}'

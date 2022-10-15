@@ -66,11 +66,11 @@ $ pip install sentencepiece
 
 for plT5:
 ```
-python main.py -n plt5 -r baseline -b code/data -t allegro/plt5-small -m allegro/plt5-small --results-dir ./plt5-results
+python main.py -n plt5 -r baseline -b data/poleval -t allegro/plt5-small -m allegro/plt5-small --results-dir ./plt5-results
 ```
 or for papuGaPT2:
 ```
-python main.py -S -n papugapt2 -r baseline -q 45 -a 10 -b data -t dkleczek/papuGaPT2 -m dkleczek/papuGaPT2 --results-dir papugapt2-results --test-batch-size 250 --few-shot
+python main.py -S -n papugapt2 -r baseline -q 45 -a 10 -b data/poleval -t dkleczek/papuGaPT2 -m dkleczek/papuGaPT2 --results-dir papugapt2-results --test-batch-size 250 --few-shot
 ```
 
 ### Results
