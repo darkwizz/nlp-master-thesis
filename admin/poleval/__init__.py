@@ -1,4 +1,7 @@
 from argparse import _MutuallyExclusiveGroup, _SubParsersAction
+from . import command
+
+__all__ = ['prepare_arg_parser', 'command']
 
 
 def prepare_arg_parser(subparsers: _SubParsersAction):

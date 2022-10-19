@@ -17,7 +17,7 @@ def list_command_providers():
     return result
 
 
-def main(parsed_args, main_parser):
+def main(parsed_args, main_parser, provider_args):
     available_providers = list_command_providers()
     if parsed_args.list:
         for provider in available_providers:
@@ -28,8 +28,8 @@ def main(parsed_args, main_parser):
         raise ArgumentError('No such available dataset')
     provider_package = import_module(f'admin.{parsed_args.source}')
     subparsers = main_parser.add_subparsers()
-    provider_parser = provider_package.prepare_arg_parser(subparsers)
-    args = provider_parser.parse_args()
+    provider_parser: ArgumentParser = provider_package.prepare_arg_parser(subparsers)
+    args = provider_parser.parse_args(provider_args)
     provider_package.command.main(args)
 
 
@@ -38,5 +38,5 @@ if __name__ == '__main__':
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-l', '--list', action='store_true', help='list all available data source command providers')
     group.add_argument('-s', '--source', help='name of the data source and the command package (e.g. poleval). Must be implemented under admin/ package and provide its own argument parser')
-    args, _ = parser.parse_known_args()
-    main(args, parser)
+    args, rest_args = parser.parse_known_args()
+    main(args, parser, rest_args)
