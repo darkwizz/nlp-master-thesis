@@ -109,3 +109,46 @@ numeric_entity_filter, proper_noun=prep.propn_filter)
 
 plot_questions_distribution_into_file(split_subsets, prep.QUESTION_TYPES, 'train_subsets_dist.png')
 ```
+
+## Admin commands
+
+Under `admin/` package, there can be placed own implementations of administration utilities for processing available data. There are two available now - utilities for PolEval dataset and the Polish subset of MKQA dataset. Every possible dataset utilities command implementation must be a nested Python package with the prepared `ArgumentParser` instance, which defines all necessary arguments. The function which returns this instance should look like this:
+
+```py
+# in __init__.py
+from argparse import _SubParsersAction
+
+
+def prepare_arg_parser(subparsers: _SubParsersAction):  # subparsers is passed by run_command.py
+  parser = subparsers.add_parser('-s poleval')
+  parser.add_argument(...)
+  # other arguments/argument groups
+  return parser 
+```
+
+Near `__init__.py`, there should be `command.py` with `main(args)` function. It is too, called from `run_command.py`. Using `run_command.py` is following:
+
+```bash
+$ python run_command.py [-l | --list]  # lists available implementations under admin/
+# like this:
+# python run_command.py -l
+#   poleval
+#   mkqa_pl
+
+$ python run_command.py [-s | --source] poleval -h  # prints help for this utility commands provider
+# like this:
+#
+# usage: run_command.py -s poleval [-h] [-p | -g | -a] [-n NDUPLICATES] -d DIRECTORY -t TARGET_PATH
+#
+# optional arguments:
+#  -h, --help            show this help message and exit
+#  -p, --prompts         append prompts to all questions and answers from the same pool
+#  -g, --gprompts        split questions on groups and each group has its own pool of prompts
+#  -a, --artificial      enclose questions and answers by an artificial suffix and a prefix
+#  -n NDUPLICATES, --nduplicates NDUPLICATES
+#                       number of possible duplicates of every data item. 0 means only the original item
+#  -d DIRECTORY, --directory DIRECTORY
+#                       source directory with all available PolEval subsets
+#  -t TARGET_PATH, --target_path TARGET_PATH
+#                       destination path of the processed dataset
+```
