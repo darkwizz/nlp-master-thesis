@@ -1,6 +1,7 @@
 import spacy
 import numpy as np
 import seaborn as sns
+from tqdm import tqdm
 
 sns.set_theme()
 
@@ -25,7 +26,7 @@ def get_number_of_tokens_in_txt(text):
 
 def get_number_of_tokens_in_dataset(dataset, fields_to_count):
     result = 0
-    for line in dataset:
+    for line in tqdm(dataset):
         for field in fields_to_count:
             result += get_number_of_tokens_in_txt(line[field])
     return result
