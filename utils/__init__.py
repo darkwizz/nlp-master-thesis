@@ -1,3 +1,4 @@
+import os
 import spacy
 import numpy as np
 import seaborn as sns
@@ -6,6 +7,15 @@ from tqdm import tqdm
 sns.set_theme()
 
 _pl_nlp = spacy.load('pl_core_news_lg')
+
+
+def compose_subsets_paths(base_path):
+    subset_dirs = {}
+    for item in os.listdir(base_path):
+        key = item.lower().replace('-', '_').replace(' ', '_')
+        path = os.path.join(base_path, item)
+        subset_dirs[key] = path
+    return subset_dirs
 
 
 def plot_questions_distribution_into_file(grouped_questions, question_types, file_path, ax=None):

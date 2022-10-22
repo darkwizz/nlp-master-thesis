@@ -35,7 +35,7 @@ def main(parsed_args, main_parser, provider_args):
 
 if __name__ == '__main__':
     parser = ArgumentParser(add_help=False)
-    group = parser.add_mutually_exclusive_group()
+    group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-l', '--list', action='store_true', help='list all available data source command providers')
     group.add_argument('-s', '--source', help='name of the data source and the command package (e.g. poleval). Must be implemented under admin/ package and provide its own argument parser')
     args, rest_args = parser.parse_known_args()
