@@ -1,4 +1,5 @@
 import os
+import regex
 from tqdm import tqdm
 from datasets import load_dataset_builder, load_dataset, Dataset
 
@@ -27,6 +28,9 @@ def _extract_pl_mkqa(mkqa):
         answer = answers[0]['text']
         if not answer:
             continue
+        found_floats = regex.findall(r'\d+\.0', answer)
+        for found_fl in found_floats:
+            answer = answer.replace(found_fl, found_fl.split('.')[0])
 
         if ans_type == 'binary':
             answer = answer.replace('yes', 'tak').replace('no', 'nie')
@@ -36,7 +40,7 @@ def _extract_pl_mkqa(mkqa):
             aliases.remove(answer)
         
         result.append({
-            'question': f'{item["queries"]["pl"]}?',
+            'question': f'{item["queries"]["pl"].capitalize()}?',
             'orig_question': f'{item["query"]}?',
             'answer': answer,
             'answer_type': ans_type,
