@@ -47,7 +47,8 @@ def load_data_for_split(questions_path, questions_feature_name, answers_path=Non
         for line in questions_file:
             formatted_line = line.strip()
             if formatted_line:
-                result[questions_feature_name].append(formatted_line)
+                question = formatted_line.split(sep)[0]
+                result[questions_feature_name].append(question)
     
     if answers_path and answers_feature_name:
         result[answers_feature_name] = []

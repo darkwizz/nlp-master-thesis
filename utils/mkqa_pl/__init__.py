@@ -28,6 +28,9 @@ def _extract_pl_mkqa(mkqa):
         if not answer:
             continue
 
+        if ans_type == 'binary':
+            answer = answer.replace('yes', 'tak').replace('no', 'nie')
+
         aliases = answers[0]['aliases']
         if answer in aliases:
             aliases.remove(answer)
@@ -54,11 +57,11 @@ def download_pl_subset(train_test_split=0.7, seed=42621):
 
 def save_dataset(dataset, target_dir, extension='tsv', sep='\t'):
     if not (os.path.exists(target_dir) and os.path.isdir(target_dir)):
-        os.mkdir(target_dir)
+        os.makedirs(target_dir, exist_ok=True)
     in_out = open(os.path.join(target_dir, f'in.{extension}'), 'w')
     expected_out = open(os.path.join(target_dir, f'expected.{extension}'), 'w')
     for item in dataset:
-        question_line = f'{item["question"]}\n'
+        question_line = sep.join([item['question'], item['orig_question'], item['answer_type']]) + '\n'
         answer_line = sep.join([item['answer'],] + (item['alternatives'] or [])) + '\n'
         in_out.write(question_line)
         expected_out.write(answer_line)
