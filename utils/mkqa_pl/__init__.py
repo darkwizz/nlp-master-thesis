@@ -24,15 +24,20 @@ def _extract_pl_mkqa(mkqa):
         if ans_type == 'unanswerable':
             continue
 
-        if not answers[0]['text']:
+        answer = answers[0]['text']
+        if not answer:
             continue
+
+        aliases = answers[0]['aliases']
+        if answer in aliases:
+            aliases.remove(answer)
         
         result.append({
             'question': f'{item["queries"]["pl"]}?',
             'orig_question': f'{item["query"]}?',
-            'answer': answers[0]['text'],
+            'answer': answer,
             'answer_type': ans_type,
-            'alternatives': answers[0]['aliases']
+            'alternatives': aliases
         })
     return Dataset.from_list(result)
 

@@ -40,14 +40,14 @@ def get_gpt3_answered_questions(api_key, data):
 
 
 def main():
-    base_path = os.getenv('BASE_DATA_PATH', './data')
+    base_path = os.getenv('BASE_DATA_PATH', './data/poleval')
     api_key = os.getenv('OPENAI_API_KEY', None)
 
     if not api_key:
         print('No OpenAI API key provided')
         exit(-1)
     
-    test_data = load_datasets(test_B=f'{base_path}/test-B')['test_B']
+    test_data = load_datasets(test=f'{base_path}/test-A')['test']
     answers, questions, expected = get_gpt3_answered_questions(api_key, test_data)
     results_dir = './gpt3-results'
     write_results_to_tsv(results_dir, questions, answers, expected)
