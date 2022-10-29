@@ -24,6 +24,7 @@ def main(args):
         if args.count_token:
             print_number_of_tokens(data)
         else:
+            print('Saving MKQA as CSV...')
             for subset in data:
                 save_dataset(data[subset], os.path.join(target_dir, subset))
         return
