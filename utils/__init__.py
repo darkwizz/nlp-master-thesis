@@ -4,6 +4,8 @@ import numpy as np
 import seaborn as sns
 from tqdm import tqdm
 
+from utils.workflow import info_message
+
 sns.set_theme()
 
 _pl_nlp = spacy.load('pl_core_news_lg')
@@ -34,9 +36,19 @@ def get_number_of_tokens_in_txt(text):
     return len(_pl_nlp(text))
 
 
+@info_message('Counting number of tokens in a dataset')
 def get_number_of_tokens_in_dataset(dataset, fields_to_count):
     result = 0
     for line in tqdm(dataset):
         for field in fields_to_count:
             result += get_number_of_tokens_in_txt(line[field])
     return result
+
+
+@info_message('Counting total number of tokens in data')
+def get_total_number_of_tokens_in_datasets(data, fields_to_count):
+    total_n_tokens = 0
+    for subset in data:
+        n_tokens = get_number_of_tokens_in_dataset(data[subset], fields_to_count)
+        total_n_tokens += n_tokens
+    return total_n_tokens

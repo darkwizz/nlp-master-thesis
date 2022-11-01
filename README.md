@@ -18,6 +18,8 @@ Artur Sokol
     1. [Custom PolEval filters](#grouping-poleval-questions-using-filters)
     2. [Administration commands](#admin-commands)
 4. [Experiments iterations](#experiments-iterations)
+    1. [#0](#iteration-0)
+    2. [#1](#iteration-1)
 
 ... [TODO]
 
@@ -173,3 +175,10 @@ $ python run_command.py [-s | --source] poleval -h  # prints help for this utili
 ```
 
 ## Experiments iterations
+Every data iteration is described under this section. Data iteration means a separate bunch of already preprocessed and merged into one datasets which is used to train and evaluate models. Every iteration description contains a list of administration script (`run_command.py`, see [here](#admin-commands)) runs, including preprocessing and final merge into one set of train, dev and test subsets in the PolEval format. `./data-iterations/#-{iteration-name}` from the scripts is the format which was used to store final datasets for each iteration.
+
+### Iteration #0
+Only PolEval and little preprocessed MKQA are used here.
+
+### Iteration #1
+PolEval + min-MKQA and one more dataset are used here.

@@ -2,12 +2,9 @@ import os
 
 
 def print_number_of_tokens(data):
-    from utils import get_number_of_tokens_in_dataset
+    from utils import get_total_number_of_tokens_in_datasets
 
-    total_n_tokens = 0
-    for subset in data:
-        n_tokens = get_number_of_tokens_in_dataset(data[subset], ['question', 'answer'])
-        total_n_tokens += n_tokens
+    total_n_tokens = get_total_number_of_tokens_in_datasets(data, ['question', 'answer'])
     print(f'Number of tokens in the downloaded MKQA dataset: {total_n_tokens}')
 
 
