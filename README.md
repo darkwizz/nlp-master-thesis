@@ -5,6 +5,15 @@ Artur Sokol
 
 ---
 
+## Table of contents
+
+1. [About Closed-book QA](#briefly-about-the-problem)
+2. [How to use the main script](#general-help)
+3. [Environment setup notes](#note-about-the-environment)
+4. [Main script usage examples](#examples)  
+... [TODO]
+
+---
 
 ### Briefly about the problem
 Closed-book Question Answering means that a trained model in order to answer on a question does not need any provided context - it uses its own knowledge:
