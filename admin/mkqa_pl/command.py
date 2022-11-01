@@ -26,7 +26,7 @@ def main(args):
         else:
             print('Saving MKQA as CSV...')
             for subset in data:
-                save_dataset(data[subset], os.path.join(target_dir, subset))
+                save_dataset(data[subset], os.path.join(target_dir, subset), keep_originals=args.original)
         return
     data_base_dir = args.directory
     subset_dirs = compose_subsets_paths(data_base_dir)

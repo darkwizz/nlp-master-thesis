@@ -14,4 +14,5 @@ def prepare_arg_parser(subparsers: _SubParsersAction):
     count_me_group.add_argument('-t', '--target_path', help='destination path of the processed dataset. It will be saved in the PolEval format')
     parser.add_argument('-n', '--nduplicates', type=int, default=0, help='number of possible duplicates of every data item. 0 means only the original item')
     parser.add_argument('-s', '--seed', default=6325, help='randomizing seed')
+    parser.add_argument('-o', '--original', action='store_true', help='include the original question and answer when downloading. By default they are not')
     return parser

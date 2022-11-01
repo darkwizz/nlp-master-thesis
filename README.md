@@ -8,14 +8,22 @@ Artur Sokol
 ## Table of contents
 
 1. [About Closed-book QA](#briefly-about-the-problem)
-2. [How to use the main script](#general-help)
-3. [Environment setup notes](#note-about-the-environment)
-4. [Main script usage examples](#examples)  
+2. [How to use the main script](#main-script)
+    1. [General help](#general-help)
+    2. [Environment setup notes](#note-about-the-environment)
+    3. [Main script usage examples](#examples)
+    4. [Results](#results)
+    5. [Evaluation](#evaluation)
+3. [Utilities](#utilities)
+    1. [Custom PolEval filters](#grouping-poleval-questions-using-filters)
+    2. [Administration commands](#admin-commands)
+4. [Experiments iterations](#experiments-iterations)
+
 ... [TODO]
 
 ---
 
-### Briefly about the problem
+## Briefly about the problem
 Closed-book Question Answering means that a trained model in order to answer on a question does not need any provided context - it uses its own knowledge:
 
 | ![MachineReadingComprehension](./resources/open-book-QA.png) | ![CloseBookQA](./resources/close-book-QA.png) |
@@ -24,6 +32,8 @@ Closed-book Question Answering means that a trained model in order to answer on 
 
 On the contrary, Open-book QA uses an external source of knowledge (e.g. a DB of Wikipedia articles in raw format). In this case an Open-book QA model searches for _k_ best matching documents and then uses MRC to extract the answer
 
+
+## Main script
 
 ### General help
 ```
@@ -119,7 +129,7 @@ numeric_entity_filter, proper_noun=prep.propn_filter)
 plot_questions_distribution_into_file(split_subsets, prep.QUESTION_TYPES, 'train_subsets_dist.png')
 ```
 
-## Admin commands
+### Admin commands
 
 Under `admin/` package, there can be placed own implementations of administration utilities for processing available data. There are two available now - utilities for PolEval dataset and the Polish subset of MKQA dataset. Every possible dataset utilities command implementation must be a nested Python package with the prepared `ArgumentParser` instance, which defines all necessary arguments. The function which returns this instance should look like this:
 
@@ -161,3 +171,5 @@ $ python run_command.py [-s | --source] poleval -h  # prints help for this utili
 #  -t TARGET_PATH, --target_path TARGET_PATH
 #                       destination path of the processed dataset
 ```
+
+## Experiments iterations

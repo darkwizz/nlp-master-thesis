@@ -43,8 +43,9 @@ def _extract_pl_mkqa(mkqa):
 
         orig_answer = item['answers']['en'][0]['text']
         
+        question = f'{item["queries"]["pl"].capitalize()}?'.replace('??', '?')
         result.append({
-            'question': f'{item["queries"]["pl"].capitalize()}?',
+            'question': question,
             'orig_question': f'{item["query"]}?',
             'answer': answer,
             'orig_answer': orig_answer,
@@ -65,14 +66,16 @@ def download_pl_subset(train_test_split=0.7, seed=42621):
     return result_mkqa
 
 
-def save_dataset(dataset, target_dir, extension='tsv', sep='\t'):
+def save_dataset(dataset, target_dir, extension='tsv', sep='\t', keep_originals=False):
     if not (os.path.exists(target_dir) and os.path.isdir(target_dir)):
         os.makedirs(target_dir, exist_ok=True)
     in_out = open(os.path.join(target_dir, f'in.{extension}'), 'w')
     expected_out = open(os.path.join(target_dir, f'expected.{extension}'), 'w')
     for item in tqdm(dataset):
-        question_line = sep.join([item['question'], item['orig_question'], item['answer_type']]) + '\n'
-        answer_line = sep.join([item['answer'], item['orig_answer']] + (item['alternatives'] or [])) + '\n'
+        question_items = [item['question'], item['orig_question'], item['answer_type']] if keep_originals else [item['question'], item['answer_type']]
+        answer_items = [item['answer'], item['orig_answer']] if keep_originals else [item['answer']]
+        question_line = sep.join(question_items) + '\n'
+        answer_line = sep.join(answer_items + (item['alternatives'] or [])) + '\n'
         in_out.write(question_line)
         expected_out.write(answer_line)
     in_out.close()
