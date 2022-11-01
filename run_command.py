@@ -1,5 +1,5 @@
 from importlib import import_module
-from argparse import ArgumentError, ArgumentParser
+from argparse import ArgumentParser
 from tqdm import tqdm
 import os
 
@@ -19,11 +19,10 @@ def list_command_providers():
 
 def perform_merge(source_path, results_path):
     from utils.workflow import load_data_for_split
-
+    
     subsets = ['dev', 'train', 'test']
-    if not (os.path.exists(results_path) and os.path.isdir(results_path)):
-        for subset in subsets:
-            os.makedirs(os.path.join(results_path, subset), exist_ok=True)
+    for subset in subsets:
+        os.makedirs(os.path.join(results_path, subset), exist_ok=True)
 
     expected_files = {subset: open(os.path.join(results_path, subset, 'expected.tsv'), 'a') for subset in subsets}
     in_files = {subset: open(os.path.join(results_path, subset, 'in.tsv'), 'a') for subset in subsets}
@@ -34,9 +33,9 @@ def perform_merge(source_path, results_path):
             dataset = load_data_for_split(os.path.join(dataset_path, 'in.tsv'), 'question', os.path.join(dataset_path, 'expected.tsv'), 'answer')
             for item in tqdm(dataset):
                 question_line = item["question"] + '\n'
-                answer_line = "\t".join([item["answer"]] + item["alternatives"]) + '\n'
-                # expected_files[subset].write(answer_line)
-                # in_files[subset].write(question_line)
+                answer_line = "\t".join([item["answer"]] + item.get("alternatives")) + '\n'
+                expected_files[subset].write(answer_line)
+                in_files[subset].write(question_line)
     for exp_file, in_file in zip(expected_files.values(), in_files.values()):
         exp_file.close()
         in_file.close()
@@ -61,7 +60,7 @@ def main(parsed_args, main_parser, provider_args, help_func=lambda: print('Help 
         exit(0)
 
     if parsed_args.source not in available_providers:
-        raise ArgumentError('No such available dataset')
+        raise ValueError('No such available dataset')
     provider_package = import_module(f'admin.{parsed_args.source}')
     subparsers = main_parser.add_subparsers()
     provider_parser: ArgumentParser = provider_package.prepare_arg_parser(subparsers)

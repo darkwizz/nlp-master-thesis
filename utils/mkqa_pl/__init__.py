@@ -75,7 +75,7 @@ def save_dataset(dataset, target_dir, extension='tsv', sep='\t', keep_originals=
         question_items = [item['question'], item['orig_question'], item['answer_type']] if keep_originals else [item['question'], item['answer_type']]
         answer_items = [item['answer'], item['orig_answer']] if keep_originals else [item['answer']]
         question_line = sep.join(question_items) + '\n'
-        answer_line = sep.join(answer_items + (item['alternatives'] or [])) + '\n'
+        answer_line = sep.join(answer_items + item.get('alternatives', [])) + '\n'
         in_out.write(question_line)
         expected_out.write(answer_line)
     in_out.close()

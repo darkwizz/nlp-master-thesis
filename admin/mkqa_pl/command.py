@@ -1,6 +1,4 @@
 import os
-from utils.mkqa_pl import download_pl_subset, save_dataset
-from utils.workflow import load_datasets
 
 
 def print_number_of_tokens(data):
@@ -15,6 +13,8 @@ def print_number_of_tokens(data):
 
 def main(args):
     from utils import compose_subsets_paths
+    from utils.mkqa_pl import download_pl_subset, save_dataset
+    from utils.workflow import load_datasets
 
     print('Inside mkqa_pl subset main')
     seed = args.seed
