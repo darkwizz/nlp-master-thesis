@@ -147,7 +147,7 @@ def prepare_arg_parser(subparsers: _SubParsersAction):  # subparsers is passed b
   return parser 
 ```
 
-Near `__init__.py`, there should be `command.py` with `main(args)` function. It is too, called from `run_command.py`. Using `run_command.py` is following:
+Near `__init__.py`, there should be `command.py` with `main(args)` function. It is too, called from `run_command.py`. Some examples of using `run_command.py`:
 
 ```bash
 $ python run_command.py [-l | --list]  # lists available implementations under admin/
@@ -155,6 +155,7 @@ $ python run_command.py [-l | --list]  # lists available implementations under a
 # python run_command.py -l
 #   poleval
 #   mkqa_pl
+#   poquad
 
 $ python run_command.py [-s | --source] poleval -h  # prints help for this utility commands provider
 # like this:
@@ -172,6 +173,24 @@ $ python run_command.py [-s | --source] poleval -h  # prints help for this utili
 #                       source directory with all available PolEval subsets
 #  -t TARGET_PATH, --target_path TARGET_PATH
 #                       destination path of the processed dataset
+```
+
+To print the top-level help:
+
+```bash
+$ python run_command.py -H
+# usage: run_command.py (-l | -H | -m MERGE_PATH | -s SOURCE) [-M MERGE_RESULT]
+
+# optional arguments:
+#   -l, --list            list all available data source command providers
+#   -H, --custom_help     show this message and exit
+#   -m MERGE_PATH, --merge_path MERGE_PATH
+#                         base directory with all datasets to merge them into one. If -M is not passed, throws an error
+#   -s SOURCE, --source SOURCE
+#                         name of the data source and the command package (e.g. poleval). Must be implemented under
+#                         admin/ package and provide its own argument parser
+#   -M MERGE_RESULT, --merge_result MERGE_RESULT
+#                         target path with the result of merge
 ```
 
 ## Experiments iterations

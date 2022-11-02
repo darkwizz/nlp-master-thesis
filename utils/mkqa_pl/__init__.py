@@ -1,7 +1,7 @@
 import os
 import regex
 from tqdm import tqdm
-from datasets import load_dataset_builder, load_dataset, Dataset
+from datasets import load_dataset_builder, load_dataset, Dataset, DatasetDict
 
 from utils.workflow import info_message
 
@@ -56,13 +56,16 @@ def _extract_pl_mkqa(mkqa):
 
 
 @info_message('Downloading MKQA')
-def download_pl_subset(train_test_split=0.7, seed=42621):
+def download_pl_subset(train_test_split=0.7, seed=42621, split=False):
     mkqa = load_dataset('mkqa', split='train')  # MKQA has only 'train' split, but the result is still returned as DatasetDict
-    cleaned_mkqa = _extract_pl_mkqa(mkqa)
-    result_mkqa = cleaned_mkqa.train_test_split(train_size=train_test_split, seed=seed)
-    dev_test_result = result_mkqa['test'].train_test_split(0.5, seed=seed)
-    result_mkqa['dev'] = dev_test_result['train']
-    result_mkqa['test'] = dev_test_result['test']
+    result_mkqa = _extract_pl_mkqa(mkqa)
+    if split:
+        result_mkqa = result_mkqa.train_test_split(train_size=train_test_split, seed=seed)
+        dev_test_result = result_mkqa['test'].train_test_split(0.5, seed=seed)
+        result_mkqa['dev'] = dev_test_result['train']
+        result_mkqa['test'] = dev_test_result['test']
+    else:
+        result_mkqa = DatasetDict({'train': result_mkqa})
     return result_mkqa
 
 

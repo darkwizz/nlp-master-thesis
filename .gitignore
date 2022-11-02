@@ -135,3 +135,4 @@ dmypy.json
 run-gpt3-demo.sh
 .to-send
 lquad*
+*data*

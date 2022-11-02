@@ -17,7 +17,7 @@ def main(args):
     seed = args.seed
     target_dir = args.target_path
     if args.download:
-        data = download_pl_subset(seed=seed)
+        data = download_pl_subset(seed=seed, split=args.split)
         if args.count_token:
             print_number_of_tokens(data)
         else:
