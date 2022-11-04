@@ -51,7 +51,7 @@ optional arguments:
   -r {baseline}, --revision {baseline}
                         model revision, the names might be weird as they should follow Python naming conventions
   -b BASE_DATA_PATH, --base-data-path BASE_DATA_PATH
-                        base path to all data. Every kind of data should be placed there. Right now their names are hardcoded: test-A, test-B, train
+                        base path to all data. Every kind of data should be placed there. Right now their names are hardcoded: test, dev, train
   -t TOKENIZER_PATH, --tokenizer-path TOKENIZER_PATH
                         can be a name on huggingface or a local path
   -m MODEL_PATH, --model-path MODEL_PATH

@@ -6,7 +6,7 @@ from transformers import T5Tokenizer, DataCollatorForSeq2Seq, \
 
 def main(parsed_args):
     base_data_path = parsed_args.base_data_path
-    data = load_datasets(test_A=f'{base_data_path}/test-A', test_B=f'{base_data_path}/test-B',
+    data = load_datasets(test=f'{base_data_path}/test', dev=f'{base_data_path}/dev',
                          train=f'{base_data_path}/train')
     
     tokenizer = T5Tokenizer.from_pretrained(parsed_args.tokenizer_path)
@@ -40,7 +40,7 @@ def main(parsed_args):
         model=model,
         args=training_args,
         train_dataset=tokenized_data['train'],
-        eval_dataset=tokenized_data['test_A'],
+        eval_dataset=tokenized_data['dev'],
         tokenizer=tokenizer,
         data_collator=data_collator,
     )
@@ -49,7 +49,7 @@ def main(parsed_args):
 
     test_batch_size = parsed_args.test_batch_size
     test_max_len = parsed_args.test_max_length
-    answers, questions, expected = get_answered_questions(tokenized_data['test_A'], model,
+    answers, questions, expected = get_answered_questions(tokenized_data['test'], model,
                                             tokenizer, test_batch_size, test_max_len)
     results_base_path = f'./{parsed_args.model_name}/{parsed_args.revision}/{parsed_args.results_dir}'
     write_results_to_tsv(results_base_path, questions, answers, expected)
