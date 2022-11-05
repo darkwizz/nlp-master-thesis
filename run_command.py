@@ -30,6 +30,9 @@ def perform_merge(source_path, results_path):
         print(f'Processing dataset: {dataset_dir}...')
         for subset in subsets:
             dataset_path = os.path.join(source_path, dataset_dir, subset)
+            if not os.path.exists(dataset_path):
+                continue
+            
             dataset = load_data_for_split(os.path.join(dataset_path, 'in.tsv'), 'question', os.path.join(dataset_path, 'expected.tsv'), 'answer')
             for item in tqdm(dataset):
                 question_line = item["question"] + '\n'

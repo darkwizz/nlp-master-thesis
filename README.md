@@ -229,7 +229,7 @@ Every data iteration is described under this section. Data iteration means a sep
 Only PolEval is used here.
 
 ### Iteration #1
-PolEval + MKQA are used here.
+PolEval + MKQA are used here. This time (and for all further iterations) PolEval train and dev (test-B) subsets are switched (because train is 2.5 times smaller).
 
 ### Iteration #2
 PolEval + MKQA and one more dataset which contains questions to law articles are used here.
