@@ -24,10 +24,10 @@ def read_poquad_data(base_directory, include_impossible):
                 if qas['is_impossible'] and not include_impossible:
                     continue
                 
-                question = qas['question']
+                question = qas['question'].replace('\n', ' ')
                 answer_field = qas['plausible_answers'][0] if qas['is_impossible'] else qas['answers'][0]
-                answer = answer_field['generative_answer']
-                alternatives = [answer_field['text']]
+                answer = answer_field['generative_answer'].replace('\n', ' ')
+                alternatives = [] if '\n' in answer_field['text'] else [answer_field['text']]
                 subset_dict['question'].append(question)
                 subset_dict['answer'].append(answer)
                 subset_dict['alternatives'].append(alternatives)
