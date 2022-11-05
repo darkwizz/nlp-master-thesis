@@ -18,10 +18,14 @@ Artur Sokol
     1. [Custom PolEval filters](#grouping-poleval-questions-using-filters)
     2. [Administration commands](#admin-commands)
 4. [Experiments iterations](#experiments-iterations)
-    1. [#0](#iteration-0)
-    2. [#1](#iteration-1)
+    1. [#0: baseline (PolEval only)](#iteration-0)
+    2. [#1: PolEval + MKQA](#iteration-1)
+    3. [#2: PolEval + MKQA + Law questions](#iteration-2)
+    4. [#3: PolEval + MKQA + PoQuAD](#iteration-3)
+    5. [#4: all datasets](#iteration-4)
+    6. [#5: artificial suffixes and prefixes](#iteration-5)
+    7. [#6: natural prompts](#iteration-6)
 
-... [TODO]
 
 ---
 
@@ -82,6 +86,31 @@ When running plT5 one more library should be installed:
 $ pip install sentencepiece
 ```
 
+Another issue which might show up during loading T5 tokenizer (using `from_pratrained`) can be identified by this error:
+```py
+>>> tokenizer = AutoTokenizer.from_pretrained('allegro/plt5-large')
+# ...
+# ...
+# ImportError:
+# T5Converter requires the protobuf library but it was not found in your environment. Checkout the instructions on the
+# installation page of its repo: https://github.com/protocolbuffers/protobuf/tree/master/python#installation and follow the ones that match your environment.
+```
+In this case installing protobuf may fix the issue:
+```bash
+$ pip install protobuf
+```
+
+However, installing the latest version of `protobuf` might not fix the issue and this error will be raised:
+```
+TypeError: Descriptors cannot not be created directly.
+If this call came from a _pb2.py file, your generated code is out of date and must be regenerated with protoc >= 3.19.0.
+If you cannot immediately regenerate your protos, some other possible workarounds are:
+ 1. Downgrade the protobuf package to 3.20.x or lower.
+ 2. Set PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python (but this will use pure-Python parsing and will be much slower).
+
+More information: https://developers.google.com/protocol-buffers/docs/news/2022-05-06#python-updates
+```
+In this case downgrading `protobuf` to `3.20.*` solves the issue and the tokenizer can be loaded.
 
 ### Examples
 
@@ -197,7 +226,22 @@ $ python run_command.py -H
 Every data iteration is described under this section. Data iteration means a separate bunch of already preprocessed and merged into one datasets which is used to train and evaluate models. Every iteration description contains a list of administration script (`run_command.py`, see [here](#admin-commands)) runs, including preprocessing and final merge into one set of train, dev and test subsets in the PolEval format. `./data-iterations/#-{iteration-name}` from the scripts is the format which was used to store final datasets for each iteration.
 
 ### Iteration #0
-Only PolEval and little preprocessed MKQA are used here.
+Only PolEval is used here.
 
 ### Iteration #1
-PolEval + min-MKQA and one more dataset are used here.
+PolEval + MKQA are used here.
+
+### Iteration #2
+PolEval + MKQA and one more dataset which contains questions to law articles are used here.
+
+### Iteration #3
+PolEval + MKQA + [PoQuAD](https://github.com/ipipan/poquad) are used here.
+
+### Iteration #4
+All datasets from the previous iterations are used for training.
+
+### Iteration #5
+All datasets are used here, but questions and answers are enclosed by artificial tags
+
+### Iteration #6
+All datasets are used for training, but questions and answers contain also a natural language prompt.

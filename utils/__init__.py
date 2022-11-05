@@ -1,5 +1,4 @@
 import os
-import spacy
 import numpy as np
 import seaborn as sns
 from tqdm import tqdm
@@ -7,8 +6,6 @@ from tqdm import tqdm
 from utils.workflow import info_message
 
 sns.set_theme()
-
-_pl_nlp = spacy.load('pl_core_news_lg')
 
 
 def compose_subsets_paths(base_path):
@@ -32,24 +29,40 @@ def plot_questions_distribution_into_file(grouped_questions, question_types, fil
     bp.get_figure().savefig(file_path, bbox_inches='tight')
 
 
-def get_number_of_tokens_in_txt(text):
-    return len(_pl_nlp(text))
+def get_number_of_tokens_in_txt(nlp, text):
+    return len(nlp(text))
 
 
-@info_message('Counting number of tokens in a dataset')
-def get_number_of_tokens_in_dataset(dataset, fields_to_count):
+@info_message('Counting number of tokens in a dataset using spaCy')
+def get_number_of_tokens_in_dataset_spacy(nlp, dataset, fields_to_count):
     result = 0
     for line in tqdm(dataset):
         for field in fields_to_count:
-            result += get_number_of_tokens_in_txt(line[field])
+            result += get_number_of_tokens_in_txt(nlp, line[field])
+    return result
+
+
+@info_message('Counting number of tokens in a dataset using AutoTokenizer')
+def get_number_of_tokens_in_dataset_tokenizer(tokenizer, dataset, fields_to_count):
+    result = 0
     return result
 
 
 @info_message('Counting total number of tokens in data')
-def get_total_number_of_tokens_in_datasets(data, fields_to_count):
+def get_total_number_of_tokens_in_datasets(data, fields_to_count, tokenizer_type='spacy'):
+    if tokenizer_type.lower() == 'spacy':
+        import spacy
+        pl_nlp = spacy.load('pl_core_news_lg')
+    else:
+        from transformers import AutoTokenizer
+        tokenizer = AutoTokenizer.from_preatrained(tokenizer_type)
+
     total_n_tokens = 0
     for subset in data:
-        n_tokens = get_number_of_tokens_in_dataset(data[subset], fields_to_count)
+        if tokenizer_type.lower() == 'spacy':
+            n_tokens = get_number_of_tokens_in_dataset_spacy(pl_nlp, data[subset], fields_to_count)
+        else:
+            n_tokens = get_number_of_tokens_in_dataset_tokenizer(tokenizer, data[subset], fields_to_count)
         total_n_tokens += n_tokens
     return total_n_tokens
 
