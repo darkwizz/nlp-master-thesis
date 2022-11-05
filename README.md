@@ -153,9 +153,10 @@ Some of the filters are **overlapping**, which means that when calling suggested
 ```py
 from utils import plot_questions_distribution_into_file
 from utils import data_preprocess as prep
+from utils.poleval import question_filters as filters
 
-split_subsets = prep.split_data_by_filters(data, fill_gap=prep.fill_gap_filter, boolean=prep.boolean_filter, mchoice=prep.multiple_choice_filter, named_living=prep.living_entity_filter, named_entity=prep.named_entity_filter, numeric=prep.
-numeric_entity_filter, proper_noun=prep.propn_filter)
+split_subsets = prep.split_data_by_filters(data, fill_gap=filters.fill_gap_filter, boolean=filters.boolean_filter, mchoice=filters.multiple_choice_filter, named_living=filters.living_entity_filter, named_entity=filters.named_entity_filter, numeric=filters.
+numeric_entity_filter, proper_noun=filters.propn_filter)
 
 plot_questions_distribution_into_file(split_subsets, prep.QUESTION_TYPES, 'train_subsets_dist.png')
 ```
@@ -208,18 +209,27 @@ To print the top-level help:
 
 ```bash
 $ python run_command.py -H
-# usage: run_command.py (-l | -H | -m MERGE_PATH | -s SOURCE) [-M MERGE_RESULT]
-
+# usage: run_command.py (-l | -H | -m MERGE_PATH | -s SOURCE | -T) [-M MERGE_RESULT] [-e ENGINE] [-d DIRECTORY]
+#
 # optional arguments:
 #   -l, --list            list all available data source command providers
 #   -H, --custom_help     show this message and exit
 #   -m MERGE_PATH, --merge_path MERGE_PATH
-#                         base directory with all datasets to merge them into one. If -M is not passed, throws an error
+#                         base directory with all datasets to merge them into one
 #   -s SOURCE, --source SOURCE
 #                         name of the data source and the command package (e.g. poleval). Must be implemented under
 #                         admin/ package and provide its own argument parser
+#   -T, --token_stats     show the shortest and longest question/answer lengths
 #   -M MERGE_RESULT, --merge_result MERGE_RESULT
 #                         target path with the result of merge
+#
+# Token Stats:
+#   Settings for counting longest and shortest questions and answers in a dataset
+#
+#   -e ENGINE, --engine ENGINE
+#                         which tokenizing engine to use (from spaCy or pass a path to a Transformers tokenizer)
+#   -d DIRECTORY, --directory DIRECTORY
+#                         directory with the subsets of a dataset
 ```
 
 ## Experiments iterations

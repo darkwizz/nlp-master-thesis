@@ -29,7 +29,7 @@ def plot_questions_distribution_into_file(grouped_questions, question_types, fil
     bp.get_figure().savefig(file_path, bbox_inches='tight')
 
 
-def get_number_of_tokens_in_txt(nlp, text):
+def get_number_of_tokens_in_txt_spacy(nlp, text):
     return len(nlp(text))
 
 
@@ -38,7 +38,7 @@ def get_number_of_tokens_in_dataset_spacy(nlp, dataset, fields_to_count):
     result = 0
     for line in tqdm(dataset):
         for field in fields_to_count:
-            result += get_number_of_tokens_in_txt(nlp, line[field])
+            result += get_number_of_tokens_in_txt_spacy(nlp, line[field])
     return result
 
 
