@@ -1,5 +1,6 @@
 from importlib import import_module
 from argparse import ArgumentParser
+import sys
 from tqdm import tqdm
 import os
 
@@ -49,8 +50,31 @@ def get_dataset_stats(engine, dataset_path):
 
     if engine.lower() == 'spacy':
         import spacy
+        from utils import get_number_of_tokens_in_txt_spacy
         pl_nlp = spacy.load('pl_core_news_lg')
+        get_tokens_number = lambda txt: get_number_of_tokens_in_txt_spacy(pl_nlp, txt)
+    else:
+        from transformers import AutoTokenizer
+        from utils import get_number_of_tokens_in_txt_tokenizer
+        tokenizer = AutoTokenizer.from_pretrained(engine)
+        get_tokens_number = lambda txt: get_number_of_tokens_in_txt_tokenizer(tokenizer, txt)
+    
     result = {}
+    for subset in os.listdir(dataset_path):
+        result[subset] = {
+            'question': { 'min': sys.maxsize, 'max': 0 },
+            'answer': { 'min': sys.maxsize, 'max': 0 }
+        }
+        in_path = os.path.join(dataset_path, subset, 'in.tsv')
+        expected_path = os.path.join(dataset_path, subset, 'expected.tsv')
+        dataset = load_data_for_split(in_path, 'question', expected_path, 'answer')
+        for item in tqdm(dataset):
+            question_len = get_tokens_number(item['question'])
+            answer_len = get_tokens_number(item['answer'])
+            result[subset]['question']['min'] = min(result[subset]['question']['min'], question_len)
+            result[subset]['question']['max'] = max(result[subset]['question']['max'], question_len)
+            result[subset]['answer']['min'] = min(result[subset]['answer']['min'], answer_len)
+            result[subset]['answer']['max'] = max(result[subset]['answer']['max'], answer_len)
     return result
 
 

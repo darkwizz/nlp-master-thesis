@@ -33,6 +33,15 @@ def get_number_of_tokens_in_txt_spacy(nlp, text):
     return len(nlp(text))
 
 
+def get_number_of_tokens_in_txt_tokenizer(tokenizer, text):
+    eos_id = tokenizer(tokenizer.eos_token)['input_ids'][0]
+    tokens_ids = tokenizer(text)['input_ids']
+    result = len(tokens_ids)
+    if eos_id in tokens_ids:
+        result -= 1
+    return result
+
+
 @info_message('Counting number of tokens in a dataset using spaCy')
 def get_number_of_tokens_in_dataset_spacy(nlp, dataset, fields_to_count):
     result = 0
@@ -45,6 +54,9 @@ def get_number_of_tokens_in_dataset_spacy(nlp, dataset, fields_to_count):
 @info_message('Counting number of tokens in a dataset using AutoTokenizer')
 def get_number_of_tokens_in_dataset_tokenizer(tokenizer, dataset, fields_to_count):
     result = 0
+    for line in tqdm(dataset):
+        for field in fields_to_count:
+            result += get_number_of_tokens_in_txt_tokenizer(tokenizer, line[field])
     return result
 
 
