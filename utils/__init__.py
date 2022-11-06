@@ -67,7 +67,7 @@ def get_total_number_of_tokens_in_datasets(data, fields_to_count, tokenizer_type
         pl_nlp = spacy.load('pl_core_news_lg')
     else:
         from transformers import AutoTokenizer
-        tokenizer = AutoTokenizer.from_preatrained(tokenizer_type)
+        tokenizer = AutoTokenizer.from_pretrained(tokenizer_type)
 
     total_n_tokens = 0
     for subset in data:

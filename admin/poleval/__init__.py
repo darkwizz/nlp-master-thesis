@@ -15,4 +15,5 @@ def prepare_arg_parser(subparsers: _SubParsersAction):
     count_me_group: _MutuallyExclusiveGroup = parser.add_mutually_exclusive_group(required=True)
     count_me_group.add_argument('-c', '--count_token', action='store_true', help='count tokens in the dataset. Ignores any other preprocessing flag')
     count_me_group.add_argument('-t', '--target_path', help='destination path of the processed dataset')
+    parser.add_argument('-e', '--engine', default='spacy', help='used with -c flag. Tokenizer which is used to split dataset texts on tokens. Default is spaCy (case insensitive), but also can be passed a path to a Transformers tokenizer')
     return parser

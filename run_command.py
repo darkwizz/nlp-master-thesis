@@ -62,8 +62,8 @@ def get_dataset_stats(engine, dataset_path):
     result = {}
     for subset in os.listdir(dataset_path):
         result[subset] = {
-            'question': { 'min': sys.maxsize, 'max': 0 },
-            'answer': { 'min': sys.maxsize, 'max': 0 }
+            'question': { 'min': sys.maxsize, 'max': 0, 'longest': '' },
+            'answer': { 'min': sys.maxsize, 'max': 0, 'longest': '' },
         }
         in_path = os.path.join(dataset_path, subset, 'in.tsv')
         expected_path = os.path.join(dataset_path, subset, 'expected.tsv')
@@ -75,6 +75,10 @@ def get_dataset_stats(engine, dataset_path):
             result[subset]['question']['max'] = max(result[subset]['question']['max'], question_len)
             result[subset]['answer']['min'] = min(result[subset]['answer']['min'], answer_len)
             result[subset]['answer']['max'] = max(result[subset]['answer']['max'], answer_len)
+            if result[subset]['question']['max'] == question_len:
+                result[subset]['question']['longest'] = item['question']
+            if result[subset]['answer']['max'] == answer_len:
+                result[subset]['answer']['longest'] = item['answer']
     return result
 
 
@@ -86,8 +90,8 @@ def print_subsets_stats(subsets_stats):
         print(f'Subset: {subset}')
         question_stats = subsets_stats[subset]['question']
         answer_stats = subsets_stats[subset]['answer']
-        print(f'Questions => min: {question_stats["min"]}, max: {question_stats["max"]}')
-        print(f'Answers => min: {answer_stats["min"]}, max: {answer_stats["max"]}')
+        print(f'Questions => min: {question_stats["min"]}, max: {question_stats["max"]}, longest question: {question_stats["longest"]}')
+        print(f'Answers => min: {answer_stats["min"]}, max: {answer_stats["max"]}, longest answer: {answer_stats["longest"]}')
 
 
 def main(parsed_args, main_parser, provider_args, help_func=lambda: print('Help message')):
@@ -109,7 +113,7 @@ def main(parsed_args, main_parser, provider_args, help_func=lambda: print('Help 
         exit(0)
     
     if parsed_args.token_stats:
-        if not all([parsed_args.engine, parsed_args.directory]):
+        if not all([parsed_args.engine, parsed_args.source_directory]):
             print('For token stats a dataset directory path and an engine must be passed')
             exit(1)
         
@@ -136,7 +140,7 @@ if __name__ == '__main__':
     me_group.add_argument('-T', '--token_stats', action='store_true', help='show the shortest and longest question/answer lengths')
     parser.add_argument('-M', '--merge_result', help='target path with the result of merge')
     group = parser.add_argument_group(title='Token Stats', description='Settings for counting longest and shortest questions and answers in a dataset')
-    group.add_argument('-e', '--engine', default='spacy', help='which tokenizing engine to use (from spaCy or pass a path to a Transformers tokenizer)')
-    group.add_argument('-d', '--directory', help='directory with the subsets of a dataset. The subsets must be grouped and stored in PolEval format')
+    group.add_argument('-E', dest='engine', default='spacy', help='which tokenizing engine to use (from spaCy or pass a path to a Transformers tokenizer)')
+    group.add_argument('-S', '--source_directory', help='directory with the subsets of a dataset to calculate token stats. The subsets must be grouped and stored in PolEval format')
     args, rest_args = parser.parse_known_args()
     main(args, parser, rest_args, parser.print_help)
