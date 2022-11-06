@@ -11,4 +11,5 @@ def prepare_arg_parser(subparsers: _SubParsersAction):
     me_group.add_argument('-t', '--target_path', help='destination path of the processed dataset. Saved in the PolEval format')
     me_group.add_argument('-c', '--count_token', action='store_true', help='count tokens in the dataset. Ignores any other preprocessing flag')
     parser.add_argument('-i', '--impossible', action='store_true', help='include tokens with is_impossible in "true"')
+    parser.add_argument('-e', '--engine', dest='tokenizer', default='spacy', help='used with -c flag. Tokenizer which is used to split dataset texts on tokens. Default is spaCy (case insensitive), but also can be passed a path to a Transformers tokenizer')
     return parser

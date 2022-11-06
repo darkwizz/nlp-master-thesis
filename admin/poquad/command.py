@@ -41,9 +41,13 @@ def main(args):
     base_directory = args.directory
     data = read_poquad_data(base_directory, args.impossible)
     if args.count_token:
+        if not args.tokenizer:
+            print('Tokenizer must be specified')
+            exit(1)
+
         from utils import get_total_number_of_tokens_in_datasets
 
-        total_n_tokens = get_total_number_of_tokens_in_datasets(data, ['question', 'answer'])
+        total_n_tokens = get_total_number_of_tokens_in_datasets(data, ['question', 'answer'], args.tokenizer)
         print(f'Total number of tokens in {base_directory}: {total_n_tokens}')
         exit(0)
     

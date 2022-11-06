@@ -2,7 +2,6 @@ import os
 import random
 import torch
 from functools import wraps
-from datasets import Dataset, DatasetDict
 
 
 def info_message(message):
@@ -23,6 +22,8 @@ def save_trained_model(args, model):
 
 @info_message('Loading all data from the specified location')
 def load_datasets(extension='tsv', seed=93682, **dataset_paths):
+    from datasets import DatasetDict
+    
     result_dict = {}
     for dataset_key, dataset_base_dir in dataset_paths.items():
         questions_path = os.path.join(dataset_base_dir, f'in.{extension}')
@@ -38,6 +39,8 @@ def load_datasets(extension='tsv', seed=93682, **dataset_paths):
 
 def load_data_for_split(questions_path, questions_feature_name, answers_path=None,
                         answers_feature_name=None, sep='\t', seed=25462):
+    from datasets import Dataset
+
     rand = random.Random(x=seed)
     result = {
         questions_feature_name: [],

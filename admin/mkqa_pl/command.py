@@ -1,10 +1,14 @@
 import os
 
 
-def print_number_of_tokens(data):
+def print_number_of_tokens(data, tokenizer):
+    if not tokenizer:
+        print('A tokenizer must be specified')
+        exit(1)
+
     from utils import get_total_number_of_tokens_in_datasets
 
-    total_n_tokens = get_total_number_of_tokens_in_datasets(data, ['question', 'answer'])
+    total_n_tokens = get_total_number_of_tokens_in_datasets(data, ['question', 'answer'], tokenizer)
     print(f'Number of tokens in the downloaded MKQA dataset: {total_n_tokens}')
 
 
@@ -19,7 +23,7 @@ def main(args):
     if args.download:
         data = download_pl_subset(seed=seed, split=args.split)
         if args.count_token:
-            print_number_of_tokens(data)
+            print_number_of_tokens(data, args.tokenizer)
         else:
             print('Saving MKQA as CSV...')
             for subset in data:
@@ -29,5 +33,5 @@ def main(args):
     subset_dirs = compose_subsets_paths(data_base_dir)
     data = load_datasets(seed=seed, **subset_dirs)
     if args.count_token:
-        print_number_of_tokens(data)
+        print_number_of_tokens(data, args.tokenizer)
     
