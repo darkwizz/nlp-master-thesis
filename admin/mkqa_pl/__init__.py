@@ -13,7 +13,7 @@ def prepare_arg_parser(subparsers: _SubParsersAction):
     count_me_group.add_argument('-c', '--count_token', action='store_true', help='count tokens in the dataset. Ignores any other preprocessing flag')
     count_me_group.add_argument('-t', '--target_path', help='destination path of the processed dataset. It will be saved in the PolEval format')
     parser.add_argument('-n', '--nduplicates', type=int, default=0, help='number of possible duplicates of every data item. 0 means only the original item')
-    parser.add_argument('--seed', default=6325, help='randomizing seed')
+    parser.add_argument('--seed', type=int, default=6325, help='randomizing seed')
     parser.add_argument('-o', '--original', action='store_true', help='include the original question and answer when downloading. By default they are not')
     parser.add_argument('--split', action='store_true', help='perform split on train/dev/test as 70/15/15')
     parser.add_argument('-e', '--engine', dest='tokenizer', default='spacy', help='used with -c flag. Tokenizer which is used to split dataset texts on tokens. Default is spaCy (case insensitive), but also can be passed a path to a Transformers tokenizer')

@@ -21,7 +21,7 @@ def save_trained_model(args, model):
 
 
 @info_message('Loading all data from the specified location')
-def load_datasets(extension='tsv', seed=93682, **dataset_paths):
+def load_datasets(extension='tsv', sample_answer=False, seed=93682, **dataset_paths):
     from datasets import DatasetDict
     
     result_dict = {}
@@ -29,16 +29,16 @@ def load_datasets(extension='tsv', seed=93682, **dataset_paths):
         questions_path = os.path.join(dataset_base_dir, f'in.{extension}')
         answers_path = os.path.join(dataset_base_dir, f'expected.{extension}')
         if not os.path.exists(answers_path):
-            dataset = load_data_for_split(questions_path, 'question', seed=seed)
+            dataset = load_data_for_split(questions_path, 'question', seed=seed, sample_answer=sample_answer)
         else:
-            dataset = load_data_for_split(questions_path, 'question', answers_path, 'answer', seed=seed)
+            dataset = load_data_for_split(questions_path, 'question', answers_path, 'answer', sample_answer=sample_answer, seed=seed)
         result_dict[dataset_key] = dataset
     result = DatasetDict(result_dict)
     return result
 
 
 def load_data_for_split(questions_path, questions_feature_name, answers_path=None,
-                        answers_feature_name=None, sep='\t', seed=25462):
+                        answers_feature_name=None, sep='\t', sample_answer=False, seed=25462):
     from datasets import Dataset
 
     rand = random.Random(x=seed)
@@ -60,11 +60,15 @@ def load_data_for_split(questions_path, questions_feature_name, answers_path=Non
                 available_answers = line.strip().split(sep)
                 alternatives = []
                 if available_answers:
-                    answer_position = rand.randint(0, len(available_answers) - 1)
-                    choice = available_answers[answer_position]
-                    result[answers_feature_name].append(choice)
-                    for i in list(range(answer_position)) + list(range(answer_position + 1, len(available_answers))):
-                        alternatives.append(available_answers[i])
+                    if sample_answer:
+                        answer_position = rand.randint(0, len(available_answers) - 1)
+                        choice = available_answers[answer_position]
+                        result[answers_feature_name].append(choice)
+                        for i in list(range(answer_position)) + list(range(answer_position + 1, len(available_answers))):
+                            alternatives.append(available_answers[i])
+                    else:
+                        result[answers_feature_name].append(available_answers[0])
+                        alternatives.extend(available_answers[1:])
                     result['alternatives'].append(alternatives)
     return Dataset.from_dict(result)
 
