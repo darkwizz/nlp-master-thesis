@@ -16,35 +16,35 @@ def main(parsed_args):
 
     model = T5ForConditionalGeneration.from_pretrained(parsed_args.model_path)
     data_collator = DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model)
-    training_args = Seq2SeqTrainingArguments(
-        output_dir=parsed_args.training_output_dir,
-        evaluation_strategy='steps',
-        eval_steps=150,
-        learning_rate=3e-4,
-        do_train=True,
-        do_eval=True,
-        generation_max_length=8,
-        predict_with_generate=True,
-        per_device_train_batch_size=16,
-        per_device_eval_batch_size=16,
-        gradient_accumulation_steps=1,
-        adafactor=True,
-        warmup_ratio=0,
-        weight_decay=0.01,
-        save_total_limit=3,
-        overwrite_output_dir=True,
-        num_train_epochs=30
-        # fp16=True
-    )
-    trainer = Seq2SeqTrainer(
-        model=model,
-        args=training_args,
-        train_dataset=tokenized_data['train'],
-        eval_dataset=tokenized_data['dev'],
-        tokenizer=tokenizer,
-        data_collator=data_collator,
-    )
     if not parsed_args.skip_training:
+        training_args = Seq2SeqTrainingArguments(
+            output_dir=parsed_args.training_output_dir,
+            evaluation_strategy='steps',
+            eval_steps=150,
+            learning_rate=3e-4,
+            do_train=True,
+            do_eval=True,
+            generation_max_length=8,
+            predict_with_generate=True,
+            per_device_train_batch_size=16,
+            per_device_eval_batch_size=16,
+            gradient_accumulation_steps=1,
+            adafactor=True,
+            warmup_ratio=0,
+            weight_decay=0.01,
+            save_total_limit=3,
+            overwrite_output_dir=True,
+            num_train_epochs=30
+            # fp16=True
+        )
+        trainer = Seq2SeqTrainer(
+            model=model,
+            args=training_args,
+            train_dataset=tokenized_data['train'],
+            eval_dataset=tokenized_data['dev'],
+            tokenizer=tokenizer,
+            data_collator=data_collator,
+        )
         trainer.train()
 
     test_batch_size = parsed_args.test_batch_size

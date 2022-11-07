@@ -32,31 +32,32 @@ def main(parsed_args):
 
     model = AutoModelWithLMHead.from_pretrained(parsed_args.model_path)
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
-    training_args = TrainingArguments(
-        output_dir=parsed_args.training_output_dir,
-        overwrite_output_dir=True,
-        evaluation_strategy='steps',
-        per_device_train_batch_size=32,
-        per_device_eval_batch_size=24,
-        do_train=True,
-        do_eval=True,
-        learning_rate=1e-3,
-        warmup_ratio=5e-4,
-        eval_steps=150,
-        gradient_accumulation_steps=1,
-        weight_decay=0.01,
-        save_total_limit=3,
-        num_train_epochs=10
-    )
-    trainer = Trainer(
-        model=model,
-        args=training_args,
-        train_dataset=tokenized_data['train'],
-        eval_dataset=tokenized_data['dev'],
-        tokenizer=tokenizer,
-        data_collator=data_collator
-    )
+    
     if not parsed_args.skip_training:
+        training_args = TrainingArguments(
+            output_dir=parsed_args.training_output_dir,
+            overwrite_output_dir=True,
+            evaluation_strategy='steps',
+            per_device_train_batch_size=32,
+            per_device_eval_batch_size=24,
+            do_train=True,
+            do_eval=True,
+            learning_rate=1e-3,
+            warmup_ratio=5e-4,
+            eval_steps=150,
+            gradient_accumulation_steps=1,
+            weight_decay=0.01,
+            save_total_limit=3,
+            num_train_epochs=10
+        )
+        trainer = Trainer(
+            model=model,
+            args=training_args,
+            train_dataset=tokenized_data['train'],
+            eval_dataset=tokenized_data['dev'],
+            tokenizer=tokenizer,
+            data_collator=data_collator
+        )
         trainer.train()
     
     if not parsed_args.few_shot:
