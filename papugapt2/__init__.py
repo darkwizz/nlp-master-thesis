@@ -42,7 +42,7 @@ class PapuGaPT2Runner:
         if 'answer' in data['test'].features:
             data['test-no-ans'] = data['test'].remove_columns('answer')
         self._tokenizer = AutoTokenizer.from_pretrained(self._tokenizer_path)
-        self._tokenizer.pad_token_id = self._tokenizer.eos_token_id
+        self._tokenizer.pad_token = self._tokenizer.eos_token
         self._data = data.map(get_gpt2_tokenizer_function(self._tokenizer, self._q_maxlen, self._a_maxlen), batched=self._batched)
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         self._data.set_format("pt", columns=["input_ids", 'attention_mask'], device=device, output_all_columns=True)
