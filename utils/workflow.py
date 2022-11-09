@@ -15,7 +15,7 @@ def info_message(message):
 
 @info_message('Saving the model')
 def save_trained_model(args, model):
-    target_dir = os.path.join('.', args.model_name, args.revision, 'trained-model')
+    target_dir = args.model_save_path or os.path.join('.', args.model_name, args.revision, 'trained-model')
     model.save_pretrained(target_dir)
 
 

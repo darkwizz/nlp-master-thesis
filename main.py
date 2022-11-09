@@ -27,7 +27,8 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--save-pretrained', action='store_true')
     parser.add_argument('-S', '--skip-training', action='store_true')
     parser.add_argument('--seed', type=int, default=32351, help='randomizing seed for training. Default is 32351')
-    parser.add_argument('-f', '--few-shot', action='store_true', help='for decoder-based models performs testing in a few-shot way')
+    parser.add_argument('-M', '--model-save-path', default=None, help='custom path to the saved trained model. If not passed, {model-name}/{revision}/trained-model is used instead')
+    # parser.add_argument('-f', '--few-shot', action='store_true', help='for decoder-based models performs testing in a few-shot way')
     
     args = parser.parse_args()
     main(args)
