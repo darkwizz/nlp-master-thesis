@@ -1,3 +1,4 @@
+from papugapt2 import PapuGaPT2Runner
 from utils.workflow import load_datasets, write_results_to_tsv, get_answered_questions, save_trained_model
 from papugapt2.utils import get_gpt2_tokenizer_function, get_divided_datasets, get_gpt2_few_shot_prompts, \
                             get_few_shot_answers
@@ -20,18 +21,11 @@ def test_model_few_shot(args, model, tokenizer, dataset):
 
 
 def main(parsed_args):
-    base_data_path = parsed_args.base_data_path
-    data = load_datasets(test=f'{base_data_path}/test', dev=f'{base_data_path}/dev',
-                         train=f'{base_data_path}/train')
-    
-    tokenizer = AutoTokenizer.from_pretrained(parsed_args.tokenizer_path)
-    tokenizer.pad_token = tokenizer.eos_token
-    q_maxlen = parsed_args.question_max_length
-    a_maxlen = parsed_args.answer_max_length
-    tokenized_data = data.map(get_gpt2_tokenizer_function(tokenizer, q_maxlen, a_maxlen), batched=True)
-
-    model = AutoModelWithLMHead.from_pretrained(parsed_args.model_path)
-    data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
+    few_shot_txt = '-few-shot' if parsed_args.few_shot else ''
+    results_base_path = f'./{parsed_args.model_name}/{parsed_args.revision}/{parsed_args.results_dir}{few_shot_txt}'
+    papugapt2_runner = PapuGaPT2Runner(parsed_args, results_base_path, True)
+    papugapt2_runner.prepare_data()
+    papugapt2_runner.prepare_model()
     
     if not parsed_args.skip_training:
         training_args = TrainingArguments(
@@ -48,33 +42,13 @@ def main(parsed_args):
             gradient_accumulation_steps=1,
             weight_decay=0.01,
             save_total_limit=3,
-            num_train_epochs=10
+            num_train_epochs=10,
+            seed=parsed_args.seed
         )
-        trainer = Trainer(
-            model=model,
-            args=training_args,
-            train_dataset=tokenized_data['train'],
-            eval_dataset=tokenized_data['dev'],
-            tokenizer=tokenizer,
-            data_collator=data_collator
-        )
-        trainer.train()
+        papugapt2_runner.train(training_args)
     
-    if not parsed_args.few_shot:
-        test_batch_size = parsed_args.test_batch_size
-        test_max_len = parsed_args.test_max_length
-        answers, questions, expected = get_answered_questions(tokenized_data['test'], model, tokenizer, test_batch_size, test_max_len)
-
-        formatted_answers = []
-        for generated in answers:
-            answer = generated.split('Odpowiedź: ')[1]
-            formatted_answers.append(answer)
-        answers = formatted_answers
-    else:
-        answers, questions, expected = test_model_few_shot(parsed_args, model, tokenizer, tokenized_data['test'])
-    few_shot_txt = '-few-shot' if parsed_args.few_shot else ''
-    results_base_path = f'./{parsed_args.model_name}/{parsed_args.revision}/{parsed_args.results_dir}{few_shot_txt}'
-    write_results_to_tsv(results_base_path, questions, answers, expected)
+    papugapt2_runner.test()
+    # answers, questions, expected = test_model_few_shot(parsed_args, model, tokenizer, tokenized_data['test'])
 
     if parsed_args.save_pretrained:
-        save_trained_model(parsed_args, model)
+        save_trained_model(parsed_args, papugapt2_runner.model)

@@ -82,7 +82,7 @@ def write_data_to_tsv(path, data):
 @info_message('Writing model testing results')
 def write_results_to_tsv(results_base_path, questions, answers, expected):
     if not os.path.exists(results_base_path):
-        os.mkdir(results_base_path)
+        os.makedirs(results_base_path, exist_ok=True)
 
     in_path = os.path.join(results_base_path, 'in.tsv')
     out_path = os.path.join(results_base_path, 'out.tsv')
@@ -100,11 +100,14 @@ def get_answered_questions(dataset, model, tokenizer, batch_size=50, max_len=Non
     expected = []
     while start < len(dataset['input_ids']):
         end = start + batch_size
-        batch = dataset['input_ids'][start:end]
+        batch = {
+            'input_ids': dataset['input_ids'][start:end],
+            'attention_mask': dataset['attention_mask'][start:end]
+        }
         if max_len is None:
-            batch_outs = model.generate(input_ids=torch.tensor(batch, device=device))
+            batch_outs = model.generate(**batch, device=device)
         else:
-            batch_outs = model.generate(input_ids=torch.tensor(batch), max_length=max_len, device=device)
+            batch_outs = model.generate(**batch, max_new_tokens=max_len, device=device)
         decoded = [tokenizer.decode(item, skip_special_tokens=True) for item in batch_outs]
         outputs.extend(decoded)
         questions.extend(dataset['question'][start:end])
