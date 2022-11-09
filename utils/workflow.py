@@ -1,6 +1,5 @@
 import os
 import random
-import torch
 from functools import wraps
 
 
@@ -92,8 +91,7 @@ def write_results_to_tsv(results_base_path, questions, answers, expected):
 
 
 @info_message('Testing model')
-def get_answered_questions(dataset, model, tokenizer, batch_size=50, max_len=None):
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+def get_answered_questions(dataset, model, tokenizer, batch_size=50, answer_max_len=None):
     start = 0
     outputs = []
     questions = []
@@ -104,10 +102,10 @@ def get_answered_questions(dataset, model, tokenizer, batch_size=50, max_len=Non
             'input_ids': dataset['input_ids'][start:end],
             'attention_mask': dataset['attention_mask'][start:end]
         }
-        if max_len is None:
-            batch_outs = model.generate(**batch, device=device)
+        if answer_max_len is None:
+            batch_outs = model.generate(**batch)
         else:
-            batch_outs = model.generate(**batch, max_new_tokens=max_len, device=device)
+            batch_outs = model.generate(**batch, max_new_tokens=answer_max_len)
         decoded = [tokenizer.decode(item, skip_special_tokens=True) for item in batch_outs]
         outputs.extend(decoded)
         questions.extend(dataset['question'][start:end])

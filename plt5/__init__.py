@@ -1,7 +1,8 @@
 import os
+import torch
 from transformers import AutoTokenizer, T5ForConditionalGeneration, DataCollatorForSeq2Seq, Seq2SeqTrainer
 from plt5.utils import get_t5_tokenizer_function
-from utils.workflow import get_answered_questions, load_datasets, write_results_to_tsv
+from utils.workflow import get_answered_questions, info_message, load_datasets, write_results_to_tsv
 
 
 class PlT5Runner:
@@ -32,6 +33,7 @@ class PlT5Runner:
     def model(self):
         return self._model
     
+    @info_message('Preparing data')
     def prepare_data(self):
         data_files = {
             'test': os.path.join(self._base_data_path, 'test'),
@@ -41,10 +43,14 @@ class PlT5Runner:
         data = load_datasets(**data_files)
         self._tokenizer = AutoTokenizer.from_pretrained(self._tokenizer_path)
         self._data = data.map(get_t5_tokenizer_function(self._tokenizer, self._q_maxlen, self._a_maxlen), batched=self._batched)
+        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        self._data.set_format("pt", columns=["input_ids", 'attention_mask'], device=device, output_all_columns=True)
     
+    @info_message('Preparing model')
     def prepare_model(self):
         self._model = T5ForConditionalGeneration.from_pretrained(self._model_path)
     
+    @info_message('Training')
     def train(self, training_args):
         if not all([self._data, self._model, self._tokenizer]):
             raise ValueError('Model and data must be prepared')
@@ -60,6 +66,7 @@ class PlT5Runner:
         )
         trainer.train()
     
+    @info_message('Testing model and writing results')
     def test(self):
         if not all([self._data, self._model, self._tokenizer]):
             raise ValueError('Model and data must be prepared')

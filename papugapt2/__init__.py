@@ -1,7 +1,8 @@
 import os
+import torch
 from transformers import AutoTokenizer, AutoModelWithLMHead, DataCollatorForLanguageModeling, Trainer
 from papugapt2.utils import get_gpt2_tokenizer_function
-from utils.workflow import get_answered_questions, load_datasets, write_results_to_tsv
+from utils.workflow import get_answered_questions, info_message, load_datasets, write_results_to_tsv
 
 class PapuGaPT2Runner:
     def __init__(self, parsed_args, results_base_path, batched_tokenization=True):
@@ -30,6 +31,7 @@ class PapuGaPT2Runner:
     def model(self):
         return self._model
     
+    @info_message('Preparing data')
     def prepare_data(self):
         data_files = {
             'train': os.path.join(self._base_data_path, 'train'),
@@ -42,11 +44,14 @@ class PapuGaPT2Runner:
         self._tokenizer = AutoTokenizer.from_pretrained(self._tokenizer_path)
         self._tokenizer.pad_token_id = self._tokenizer.eos_token_id
         self._data = data.map(get_gpt2_tokenizer_function(self._tokenizer, self._q_maxlen, self._a_maxlen), batched=self._batched)
-        self._data.set_format("pt", columns=["input_ids", 'attention_mask'], output_all_columns=True)
+        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        self._data.set_format("pt", columns=["input_ids", 'attention_mask'], device=device, output_all_columns=True)
     
+    @info_message('Preparing model')
     def prepare_model(self):
         self._model = AutoModelWithLMHead.from_pretrained(self._model_path)
     
+    @info_message('Training')
     def train(self, training_args):
         if not all([self._data, self._model, self._tokenizer]):
             raise ValueError('Model and data must be prepared')
@@ -62,6 +67,7 @@ class PapuGaPT2Runner:
         )
         trainer.train()
     
+    @info_message('Testing model and writing results')
     def test(self):
         if not all([self._data, self._model, self._tokenizer]):
             raise ValueError('Model and data must be prepared')
