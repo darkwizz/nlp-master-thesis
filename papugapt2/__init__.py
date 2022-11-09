@@ -82,5 +82,5 @@ class PapuGaPT2Runner:
         answers = formatted_answers
 
         if not expected:
-            expected = self.data['test']['asnwer']
+            expected = self.data['test']['answer']
         write_results_to_tsv(self._results_base_path, questions, answers, expected)

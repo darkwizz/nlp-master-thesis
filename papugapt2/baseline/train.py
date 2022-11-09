@@ -1,9 +1,7 @@
 from papugapt2 import PapuGaPT2Runner
-from utils.workflow import load_datasets, write_results_to_tsv, get_answered_questions, save_trained_model
-from papugapt2.utils import get_gpt2_tokenizer_function, get_divided_datasets, get_gpt2_few_shot_prompts, \
-                            get_few_shot_answers
-from transformers import AutoTokenizer, AutoModelWithLMHead, DataCollatorForLanguageModeling, \
-                         TrainingArguments, Trainer, pipeline
+from utils.workflow import save_trained_model
+from papugapt2.utils import get_divided_datasets, get_gpt2_few_shot_prompts, get_few_shot_answers
+from transformers import TrainingArguments, pipeline
 
 
 def test_model_few_shot(args, model, tokenizer, dataset):

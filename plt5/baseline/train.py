@@ -1,8 +1,6 @@
 from plt5 import PlT5Runner
-from utils.workflow import load_datasets, write_results_to_tsv, get_answered_questions, save_trained_model
-from plt5.utils import get_t5_tokenizer_function
-from transformers import T5Tokenizer, DataCollatorForSeq2Seq, \
-                         T5ForConditionalGeneration, Seq2SeqTrainingArguments, Seq2SeqTrainer
+from utils.workflow import save_trained_model
+from transformers import Seq2SeqTrainingArguments
 
 
 def main(parsed_args):
