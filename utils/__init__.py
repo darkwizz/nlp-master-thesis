@@ -1,11 +1,8 @@
 import os
 import numpy as np
-import seaborn as sns
 from tqdm import tqdm
 
 from utils.workflow import info_message
-
-sns.set_theme()
 
 
 def compose_subsets_paths(base_path):
@@ -18,6 +15,9 @@ def compose_subsets_paths(base_path):
 
 
 def plot_questions_distribution_into_file(grouped_questions, question_types, file_path, ax=None):
+    import seaborn as sns
+
+    sns.set_theme()
     subsets_lens = np.array([item.num_rows for item in grouped_questions.values()])
     if ax:
         bp = sns.barplot(ax=ax, x=question_types, y=subsets_lens / subsets_lens.sum())

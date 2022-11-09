@@ -19,7 +19,7 @@ def test_model_few_shot(args, model, tokenizer, dataset):
 
 
 def main(parsed_args):
-    few_shot_txt = '-few-shot' if parsed_args.few_shot else ''
+    few_shot_txt = ''  # '-few-shot' if parsed_args.few_shot else ''
     results_base_path = f'./{parsed_args.model_name}/{parsed_args.revision}/{parsed_args.results_dir}{few_shot_txt}'
     papugapt2_runner = PapuGaPT2Runner(parsed_args, results_base_path, True)
     papugapt2_runner.prepare_data()

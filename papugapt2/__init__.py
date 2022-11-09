@@ -1,6 +1,6 @@
 import os
 import torch
-from transformers import AutoTokenizer, AutoModelWithLMHead, DataCollatorForLanguageModeling, Trainer
+from transformers import AutoTokenizer, AutoModelForMaskedLM, DataCollatorForLanguageModeling, Trainer
 from papugapt2.utils import get_gpt2_tokenizer_function
 from utils.workflow import get_answered_questions, info_message, load_datasets, write_results_to_tsv
 
@@ -49,7 +49,7 @@ class PapuGaPT2Runner:
     
     @info_message('Preparing model')
     def prepare_model(self):
-        self._model = AutoModelWithLMHead.from_pretrained(self._model_path)
+        self._model = AutoModelForMaskedLM.from_pretrained(self._model_path)
     
     @info_message('Training')
     def train(self, training_args):
