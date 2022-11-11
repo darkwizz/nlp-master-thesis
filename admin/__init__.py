@@ -6,7 +6,7 @@ COMMAND_FILE = 'command.py'
 
 
 def list_command_providers():
-    admin_path = os.path.join(os.path.dirname(__file__), 'admin')
+    admin_path = os.path.dirname(__file__)
     result = []
     for admin_subitem in os.listdir(admin_path):
         full_subpath = os.path.join(admin_path, admin_subitem)
