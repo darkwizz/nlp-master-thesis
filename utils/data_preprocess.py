@@ -65,3 +65,23 @@ def get_prompt_augmented_answer(answer, prompts, placeholder='|&|', seed=1362):
 
 def get_artificially_augmented_answer(answer, prefix=ANSWER_PREFIX, suffix=ANSWER_SUFFIX):
     return f'{prefix}{answer}{suffix}'
+
+
+def _get_item_preprocessor(question_feature, question_processor, answer_feature, answer_processor):
+    def item_preprocessor(item):
+        result = {}
+        for key in item:
+            if key == question_feature:
+                result[key] = question_processor(item[key])
+            elif key == answer_feature:
+                result[key] = answer_processor(item[key])
+            else:
+                result[key] = item[key]
+        return result
+    return item_preprocessor
+
+
+def get_artificially_augmented_dataset(dataset, question_feature='question', answer_feature='answer'):
+    preprocessor = _get_item_preprocessor(question_feature, get_artificially_augmented_question, answer_feature, get_artificially_augmented_answer)
+    result = dataset.map(lambda item: preprocessor(item))
+    return result

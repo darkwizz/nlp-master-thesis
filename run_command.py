@@ -49,6 +49,7 @@ if __name__ == '__main__':
     me_group.add_argument('-s', '--source', help='name of the data source and the command package (e.g. poleval). Must be implemented under admin/ package and provide its own argument parser')
     me_group.add_argument('-T', '--token_stats', action='store_true', help='show the shortest and longest question/answer lengths')
     parser.add_argument('-M', '--merge_result', help='target path with the result of merge')
+    me_group.add_argument('-A', '--artificial-prefix', action='store_true', help='add an artificial prefix and suffix for questions and answers')
     group = parser.add_argument_group(title='Token Stats', description='Settings for counting longest and shortest questions and answers in a dataset')
     group.add_argument('-E', dest='tokenizer', default='spacy', help='which tokenizing engine to use (from spaCy or pass a path to a Transformers tokenizer)')
     group.add_argument('-S', '--source_directory', help='directory with the subsets of a dataset to calculate token stats. The subsets must be grouped and stored in PolEval format')
