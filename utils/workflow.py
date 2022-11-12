@@ -1,6 +1,7 @@
 import os
 import random
 from functools import wraps
+from tqdm import tqdm
 
 
 def info_message(message):
@@ -113,3 +114,23 @@ def get_answered_questions(dataset, model, tokenizer, batch_size=50, answer_max_
             expected.extend(dataset['answer'][start:end])
         start = end
     return outputs, questions, expected
+
+
+def save_data(data, target_directory):
+    '''
+    Used to save datasets in PolEval format into .tsv files of PolEval format.
+    Data must be a `DatasetDict` (even with one split).
+    '''
+    for subset in data:
+        target_subset_path = os.path.join(target_directory, subset)
+        os.makedirs(target_subset_path, exist_ok=True)
+        in_file = open(os.path.join(target_subset_path, 'in.tsv'), 'w')
+        expected_file = open(os.path.join(target_subset_path, 'expected.tsv'), 'w')
+        print(f'Saving subset: {subset}...')
+        for item in tqdm(data[subset]):
+            question_line = item['question'] + '\n'
+            answer_line = '\t'.join([item['answer']] + item.get('alternatives', [])) + '\n'
+            in_file.write(question_line)
+            expected_file.write(answer_line)
+        in_file.close()
+        expected_file.close()

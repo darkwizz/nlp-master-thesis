@@ -1,7 +1,7 @@
 from importlib import import_module
 from argparse import ArgumentParser
 
-from admin import get_dataset_stats, list_command_providers, perform_merge, print_subsets_stats
+from admin import get_dataset_stats, list_command_providers, perform_artificial_augmentation, perform_merge, print_subsets_stats
 
 
 def main(parsed_args, main_parser, provider_args, help_func=lambda: print('Help message')):
@@ -30,6 +30,13 @@ def main(parsed_args, main_parser, provider_args, help_func=lambda: print('Help 
         subsets_stats = get_dataset_stats(parsed_args.tokenizer, parsed_args.source_directory)
         print_subsets_stats(subsets_stats)
         exit(0)
+    
+    if parsed_args.art_augment_data_path:
+        if not parsed_args.augmentation_result:
+            print('Target path for augmented data must be provided')
+            exit(1)
+        perform_artificial_augmentation(parsed_args.art_augment_data_path, parsed_args.augmentation_result)
+        exit(0)
 
     if parsed_args.source not in available_providers:
         raise ValueError('No such available dataset')
@@ -48,8 +55,9 @@ if __name__ == '__main__':
     me_group.add_argument('-m', '--merge_path', help='base directory with all datasets to merge them into one')
     me_group.add_argument('-s', '--source', help='name of the data source and the command package (e.g. poleval). Must be implemented under admin/ package and provide its own argument parser')
     me_group.add_argument('-T', '--token_stats', action='store_true', help='show the shortest and longest question/answer lengths')
+    me_group.add_argument('-A', '--augment-artificial', dest='art_augment_data_path', help='path to subsets which add an artificial prefix and suffix for questions and answers for')
+    parser.add_argument('-R', '--augmentation_result', help='used with -A parameter. Target path for the augmented data')
     parser.add_argument('-M', '--merge_result', help='target path with the result of merge')
-    me_group.add_argument('-A', '--artificial-prefix', action='store_true', help='add an artificial prefix and suffix for questions and answers')
     group = parser.add_argument_group(title='Token Stats', description='Settings for counting longest and shortest questions and answers in a dataset')
     group.add_argument('-E', dest='tokenizer', default='spacy', help='which tokenizing engine to use (from spaCy or pass a path to a Transformers tokenizer)')
     group.add_argument('-S', '--source_directory', help='directory with the subsets of a dataset to calculate token stats. The subsets must be grouped and stored in PolEval format')

@@ -36,7 +36,7 @@ def read_poquad_data(base_directory, include_impossible):
 
 
 def main(args):
-    from utils import save_data
+    from utils.workflow import save_data
 
     base_directory = args.directory
     data = read_poquad_data(base_directory, args.impossible)

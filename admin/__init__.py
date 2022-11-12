@@ -2,6 +2,7 @@ import os
 import sys
 from tqdm import tqdm
 
+
 COMMAND_FILE = 'command.py'
 
 
@@ -89,3 +90,17 @@ def print_subsets_stats(subsets_stats):
         answer_stats = subsets_stats[subset]['answer']
         print(f'Questions => min: {question_stats["min"]}, max: {question_stats["max"]}, longest question: {question_stats["longest"]}')
         print(f'Answers => min: {answer_stats["min"]}, max: {answer_stats["max"]}, longest answer: {answer_stats["longest"]}')
+
+
+def perform_artificial_augmentation(source_path, target_path):
+    from utils.data_preprocess import get_artificially_augmented_dataset
+    from utils.workflow import load_data_for_split, save_data
+
+    data = {}
+    for subset in os.listdir(source_path):
+        dataset = load_data_for_split(os.path.join(source_path, subset, 'in.tsv'), 'question',
+                                        os.path.join(source_path, subset, 'expected.tsv'), 'answer')
+        augmented_dataset = get_artificially_augmented_dataset(dataset)
+        data[subset] = augmented_dataset
+    
+    save_data(data, target_path)
