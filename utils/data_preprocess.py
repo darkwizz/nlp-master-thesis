@@ -1,5 +1,7 @@
 import numpy as np
 
+from utils.workflow import info_message
+
 POLEVAL_QUESTION_TYPES = ['Gap filling', 'Yes/no', 'Multiple choice', 'Living named entity', 'Named entity', 'Numeric', 'Proper noun', 'Rest']
 
 PL_QUESTION_PROMPTS = {
@@ -81,6 +83,7 @@ def _get_item_preprocessor(question_feature, question_processor, answer_feature,
     return item_preprocessor
 
 
+@info_message('Enclosing questions and asnwers by an artificial prefix and suffix')
 def get_artificially_augmented_dataset(dataset, question_feature='question', answer_feature='answer'):
     preprocessor = _get_item_preprocessor(question_feature, get_artificially_augmented_question, answer_feature, get_artificially_augmented_answer)
     result = dataset.map(lambda item: preprocessor(item))

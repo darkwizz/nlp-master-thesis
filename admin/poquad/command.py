@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+from admin import QUESTION_FEATURE, ANSWER_FEATURE
 
 
 def read_poquad_data(base_directory, include_impossible):
@@ -15,8 +16,8 @@ def read_poquad_data(base_directory, include_impossible):
     result_dict = {}
     for subset in data:
         subset_dict = {
-            'question': [],
-            'answer': [],
+            QUESTION_FEATURE: [],
+            ANSWER_FEATURE: [],
             'alternatives': []
         }
         for item in data[subset]:
@@ -28,8 +29,8 @@ def read_poquad_data(base_directory, include_impossible):
                 answer_field = qas['plausible_answers'][0] if qas['is_impossible'] else qas['answers'][0]
                 answer = answer_field['generative_answer'].replace('\n', ' ')
                 alternatives = [] if '\n' in answer_field['text'] else [answer_field['text']]
-                subset_dict['question'].append(question)
-                subset_dict['answer'].append(answer)
+                subset_dict[QUESTION_FEATURE].append(question)
+                subset_dict[ANSWER_FEATURE].append(answer)
                 subset_dict['alternatives'].append(alternatives)
         result_dict[subset] = Dataset.from_dict(subset_dict)
     return DatasetDict(result_dict)
@@ -37,6 +38,7 @@ def read_poquad_data(base_directory, include_impossible):
 
 def main(args):
     from utils.workflow import save_data
+    from utils.data_preprocess import get_artificially_augmented_dataset
 
     base_directory = args.directory
     data = read_poquad_data(base_directory, args.impossible)
@@ -47,9 +49,12 @@ def main(args):
 
         from utils import get_total_number_of_tokens_in_datasets
 
-        total_n_tokens = get_total_number_of_tokens_in_datasets(data, ['question', 'answer'], args.tokenizer)
+        total_n_tokens = get_total_number_of_tokens_in_datasets(data, [QUESTION_FEATURE, ANSWER_FEATURE], args.tokenizer)
         print(f'Total number of tokens in {base_directory}: {total_n_tokens}')
         exit(0)
+    
+    if args.artificial:
+        data = get_artificially_augmented_dataset(data, QUESTION_FEATURE, ANSWER_FEATURE)
     
     target_path = args.target_path
     save_data(data, target_path)

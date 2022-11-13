@@ -4,6 +4,8 @@ from tqdm import tqdm
 
 
 COMMAND_FILE = 'command.py'
+QUESTION_FEATURE = 'question'
+ANSWER_FEATURE = 'answer'
 
 
 def list_command_providers():
@@ -32,10 +34,11 @@ def perform_merge(source_path, results_path):
             if not os.path.exists(dataset_path):
                 continue
 
-            dataset = load_data_for_split(os.path.join(dataset_path, 'in.tsv'), 'question', os.path.join(dataset_path, 'expected.tsv'), 'answer')
+            dataset = load_data_for_split(os.path.join(dataset_path, 'in.tsv'), QUESTION_FEATURE,
+                                            os.path.join(dataset_path, 'expected.tsv'), ANSWER_FEATURE)
             for item in tqdm(dataset):
-                question_line = item["question"] + '\n'
-                answer_line = "\t".join([item["answer"]] + item.get("alternatives")) + '\n'
+                question_line = item[QUESTION_FEATURE] + '\n'
+                answer_line = "\t".join([item[ANSWER_FEATURE]] + item.get("alternatives")) + '\n'
                 expected_files[subset].write(answer_line)
                 in_files[subset].write(question_line)
     for exp_file, in_file in zip(expected_files.values(), in_files.values()):
@@ -67,16 +70,16 @@ def get_dataset_stats(engine, dataset_path):
         expected_path = os.path.join(dataset_path, subset, 'expected.tsv')
         dataset = load_data_for_split(in_path, 'question', expected_path, 'answer')
         for item in tqdm(dataset):
-            question_len = get_tokens_number(item['question'])
-            answer_len = get_tokens_number(item['answer'])
+            question_len = get_tokens_number(item[QUESTION_FEATURE])
+            answer_len = get_tokens_number(item[ANSWER_FEATURE])
             result[subset]['question']['min'] = min(result[subset]['question']['min'], question_len)
             result[subset]['question']['max'] = max(result[subset]['question']['max'], question_len)
             result[subset]['answer']['min'] = min(result[subset]['answer']['min'], answer_len)
             result[subset]['answer']['max'] = max(result[subset]['answer']['max'], answer_len)
             if result[subset]['question']['max'] == question_len:
-                result[subset]['question']['longest'] = item['question']
+                result[subset]['question']['longest'] = item[QUESTION_FEATURE]
             if result[subset]['answer']['max'] == answer_len:
-                result[subset]['answer']['longest'] = item['answer']
+                result[subset]['answer']['longest'] = item[ANSWER_FEATURE]
     return result
 
 
@@ -97,10 +100,12 @@ def perform_artificial_augmentation(source_path, target_path):
     from utils.workflow import load_data_for_split, save_data
 
     data = {}
+    print('Loading data...')
     for subset in os.listdir(source_path):
-        dataset = load_data_for_split(os.path.join(source_path, subset, 'in.tsv'), 'question',
-                                        os.path.join(source_path, subset, 'expected.tsv'), 'answer')
+        dataset = load_data_for_split(os.path.join(source_path, subset, 'in.tsv'), QUESTION_FEATURE,
+                                        os.path.join(source_path, subset, 'expected.tsv'), ANSWER_FEATURE)
         augmented_dataset = get_artificially_augmented_dataset(dataset)
         data[subset] = augmented_dataset
     
+    print('Saving augmented data...')
     save_data(data, target_path)
