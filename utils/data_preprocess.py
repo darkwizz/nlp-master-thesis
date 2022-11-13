@@ -2,24 +2,23 @@ import numpy as np
 
 from utils.workflow import info_message
 
-POLEVAL_QUESTION_TYPES = ['Gap filling', 'Yes/no', 'Multiple choice', 'Living named entity', 'Named entity', 'Numeric', 'Proper noun', 'Rest']
 
-PL_QUESTION_PROMPTS = {
-    POLEVAL_QUESTION_TYPES[0]: ['Proszę uzupełnić lukę: |&|'],
-    POLEVAL_QUESTION_TYPES[1]: ['Proszę podać odpowiedź "tak" czy "nie": |&|'],
-    POLEVAL_QUESTION_TYPES[2]: ['Proszę wybrać poprawną opcję z kilku podanych: |&|', 'Zastanawiam się nad tym, którą odpowiedź z podanych jest poprawną. Proszę pomóc z pytaniem: |&|'],
-    POLEVAL_QUESTION_TYPES[3]: ['Dane pytanie jest o żywym podmiocie. Proszę powiedzieć, |&|'],
-    POLEVAL_QUESTION_TYPES[4]: ['To pytanie jest po prostu o podmiocie nazwanym. Proszę powiedzieć, |&|'],
-    POLEVAL_QUESTION_TYPES[5]: ['Prosze podać liczbę: |&|', 'W tym pytaniu odpowiedź zawiera liczbę. Proszę powiedzieć, |&|'],
-    POLEVAL_QUESTION_TYPES[6]: ['W odpowiedzi na dane pytanie jest nazwa własna. Proszę powiedzieć: |&|'],
-    POLEVAL_QUESTION_TYPES[7]: ['Proszę odpowiedzieć na pytanie niżej: |&|', 'Zawsze zastanawiałem się: |&|', 'Jaka jest odpowiedź na następujące pytanie: |&|', 'Jest pytanie: |&|']
-}
+PROMPT_PLACEHOLDER = '|&|'
+
+PL_QUESTION_PROMPTS = [
+    f'Proszę odpowiedzieć na pytanie: {PROMPT_PLACEHOLDER}',
+    f'Podane niżej pytanie wymaga odpowiedzi. {PROMPT_PLACEHOLDER}',
+    f'{PROMPT_PLACEHOLDER} Proszę podać poprawną odpowiedź na dane pytanie.',
+    f'Pytanie: {PROMPT_PLACEHOLDER} Proszę podać odpowiedź.',
+    f'Dane pytanie: {PROMPT_PLACEHOLDER}'
+]
 
 PL_ANSWER_PROMPTS = [
-    'Odpowiedź na dane pytanie to |&|',
-    'Poprawna odpowiedź: |&|',
-    'Proszę podać odpowiedź: odpowiedź to |&|',
-    'Odpowiedzią na to pytanie jest |&|'
+    f'Odpowiedź na dane pytanie to {PROMPT_PLACEHOLDER}.',
+    f'Poprawna odpowiedź: {PROMPT_PLACEHOLDER}.',
+    f'Proszę podać odpowiedź. Odpowiedź na pytanie - {PROMPT_PLACEHOLDER}.',
+    f'Odpowiedzią na to pytanie jest: {PROMPT_PLACEHOLDER}.',
+    f'Odpowiedź: {PROMPT_PLACEHOLDER}.'
 ]
 
 QUESTION_PREFIX = '<QUESTION>'
@@ -47,8 +46,9 @@ def split_data_by_filters(data, **filters):
     return result
 
 
-def get_prompt_augmented_question(question, prompts, placeholder='|&|', seed=7343):
-    rs = np.random.RandomState(seed=seed)
+def get_prompt_augmented_question(question, prompts, placeholder=PROMPT_PLACEHOLDER, rs=None):
+    if not rs:
+        rs = np.random.get_state()
     prompt = rs.choice(prompts)
     result = prompt.replace(placeholder, question)
     return result
@@ -58,8 +58,9 @@ def get_artificially_augmented_question(question, prefix=QUESTION_PREFIX, suffix
     return f'{prefix}{question}{suffix}'
 
 
-def get_prompt_augmented_answer(answer, prompts, placeholder='|&|', seed=1362):
-    rs = np.random.RandomState(seed=seed)
+def get_prompt_augmented_answer(answer, prompts, placeholder=PROMPT_PLACEHOLDER, rs=None):
+    if not rs:
+        rs = np.random.get_state()
     prompt = rs.choice(prompts)
     result = prompt.replace(placeholder, answer)
     return result
@@ -69,16 +70,14 @@ def get_artificially_augmented_answer(answer, prefix=ANSWER_PREFIX, suffix=ANSWE
     return f'{prefix}{answer}{suffix}'
 
 
-def _get_item_preprocessor(question_feature, question_processor, answer_feature, answer_processor, \
-                            question_prefix=QUESTION_PREFIX, question_suffix=QUESTION_SUFFIX, \
-                            answer_prefix=ANSWER_PREFIX, answer_suffix=ANSWER_SUFFIX):
+def _get_item_preprocessor(question_feature, question_processor, answer_feature, answer_processor):
     def item_preprocessor(item):
         result = {}
         for key in item:
             if key == question_feature:
-                result[key] = question_processor(item[key], prefix=question_prefix, suffix=question_suffix)
+                result[key] = question_processor(item[key])
             elif key == answer_feature:
-                result[key] = answer_processor(item[key], prefix=answer_prefix, suffix=answer_suffix)
+                result[key] = answer_processor(item[key])
             else:
                 result[key] = item[key]
         return result
@@ -94,4 +93,9 @@ def get_artificially_augmented_dataset(dataset, question_feature='question', ans
 
 @info_message('Prepending questions and answers by a natural prompt')
 def get_prompt_augmented_dataset(dataset, question_feature='question', answer_feature='answer', seed=2327):
-    return dataset
+    rs = np.random.RandomState(seed=seed)
+    question_prompt_processor = lambda question: get_prompt_augmented_question(question, PL_QUESTION_PROMPTS, rs=rs)
+    answer_prompt_processor = lambda answer: get_prompt_augmented_answer(answer, PL_ANSWER_PROMPTS, rs=rs)
+    preprocessor = _get_item_preprocessor(question_feature, question_prompt_processor, answer_feature, answer_prompt_processor)
+    result = dataset.map(lambda item: preprocessor(item))
+    return result

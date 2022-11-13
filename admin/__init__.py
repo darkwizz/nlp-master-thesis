@@ -120,7 +120,7 @@ def perform_prompt_augmentation(source_path, target_path, seed=5115):
     for subset in os.listdir(source_path):
         dataset = load_data_for_split(os.path.join(source_path, subset, 'in.tsv'), QUESTION_FEATURE,
                                         os.path.join(source_path, subset, 'expected.tsv'), ANSWER_FEATURE)
-        augmented_dataset = get_prompt_augmented_dataset(dataset, seed)
+        augmented_dataset = get_prompt_augmented_dataset(dataset, seed=seed)
         data[subset] = augmented_dataset
     
     print('Saving augmented data...')

@@ -64,7 +64,7 @@ if __name__ == '__main__':
     me_group.add_argument('-P', '--augment-prompt', dest='prompt_augment_data_path', help='path to subsets which should be prepended with natural prompts from the specified prompts pool. Can be seeded')
     parser.add_argument('-R', '--augmentation_result', help='used with [-A | -P] parameters. Target path for the augmented data')
     parser.add_argument('-M', '--merge_result', help='target path with the result of merge')
-    parser.add_argument('--prompt_seed', type=int, default=2650, help='used with -P parameter. Seeding value for sampling prompts from a pool')
+    parser.add_argument('--prompt_seed', type=int, default=2650, help='used with -P parameter. Seeding value for sampling prompts from a pool. Default is 2650')
     group = parser.add_argument_group(title='Token Stats', description='Settings for counting longest and shortest questions and answers in a dataset')
     group.add_argument('-E', dest='tokenizer', default='spacy', help='which tokenizing engine to use (from spaCy or pass a path to a Transformers tokenizer)')
     group.add_argument('-S', '--source_directory', help='directory with the subsets of a dataset to calculate token stats. The subsets must be grouped and stored in PolEval format')
