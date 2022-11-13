@@ -3,6 +3,7 @@ import numpy as np
 from utils.workflow import info_message
 
 
+PROMPT_TARGETS = ('both', 'question', 'answer')
 PROMPT_PLACEHOLDER = '|&|'
 
 PL_QUESTION_PROMPTS = [
@@ -14,7 +15,7 @@ PL_QUESTION_PROMPTS = [
 ]
 
 PL_ANSWER_PROMPTS = [
-    f'Odpowiedź na dane pytanie to {PROMPT_PLACEHOLDER}.',
+    f'Odpowiedź na dane pytanie to: {PROMPT_PLACEHOLDER}.',
     f'Poprawna odpowiedź: {PROMPT_PLACEHOLDER}.',
     f'Proszę podać odpowiedź. Odpowiedź na pytanie - {PROMPT_PLACEHOLDER}.',
     f'Odpowiedzią na to pytanie jest: {PROMPT_PLACEHOLDER}.',
@@ -92,10 +93,14 @@ def get_artificially_augmented_dataset(dataset, question_feature='question', ans
 
 
 @info_message('Prepending questions and answers by a natural prompt')
-def get_prompt_augmented_dataset(dataset, question_feature='question', answer_feature='answer', seed=2327):
+def get_prompt_augmented_dataset(dataset, question_feature='question', answer_feature='answer', prompt_target=PROMPT_TARGETS[0], seed=2327):
     rs = np.random.RandomState(seed=seed)
     question_prompt_processor = lambda question: get_prompt_augmented_question(question, PL_QUESTION_PROMPTS, rs=rs)
     answer_prompt_processor = lambda answer: get_prompt_augmented_answer(answer, PL_ANSWER_PROMPTS, rs=rs)
+    if prompt_target == PROMPT_TARGETS[1]:
+        answer_prompt_processor = lambda item: item
+    elif prompt_target == PROMPT_TARGETS[2]:
+        question_prompt_processor = lambda item: item
     preprocessor = _get_item_preprocessor(question_feature, question_prompt_processor, answer_feature, answer_prompt_processor)
     result = dataset.map(lambda item: preprocessor(item))
     return result

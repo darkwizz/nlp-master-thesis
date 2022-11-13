@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 
 from admin import get_dataset_stats, list_command_providers, perform_artificial_augmentation, \
     perform_merge, print_subsets_stats, perform_prompt_augmentation
+from utils.data_preprocess import PROMPT_TARGETS
 
 
 def main(parsed_args, main_parser, provider_args, help_func=lambda: print('Help message')):
@@ -40,7 +41,7 @@ def main(parsed_args, main_parser, provider_args, help_func=lambda: print('Help 
         if parsed_args.art_augment_data_path:
             perform_artificial_augmentation(parsed_args.art_augment_data_path, parsed_args.augmentation_result)
         elif parsed_args.prompt_augment_data_path:
-            perform_prompt_augmentation(parsed_args.prompt_augment_data_path, parsed_args.augmentation_result, parsed_args.prompt_seed)
+            perform_prompt_augmentation(parsed_args.prompt_augment_data_path, parsed_args.augmentation_result, parsed_args.prompt_target, parsed_args.prompt_seed)
         exit(0)
 
     if parsed_args.source not in available_providers:
@@ -65,6 +66,7 @@ if __name__ == '__main__':
     parser.add_argument('-R', '--augmentation_result', help='used with [-A | -P] parameters. Target path for the augmented data')
     parser.add_argument('-M', '--merge_result', help='target path with the result of merge')
     parser.add_argument('--prompt_seed', type=int, default=2650, help='used with -P parameter. Seeding value for sampling prompts from a pool. Default is 2650')
+    parser.add_argument('-O', '--prompt_target', choices=PROMPT_TARGETS, default=PROMPT_TARGETS[0], help='used with -P parameter. Specifies whether add a prompt to both questions and answers or to one of them')
     group = parser.add_argument_group(title='Token Stats', description='Settings for counting longest and shortest questions and answers in a dataset')
     group.add_argument('-E', dest='tokenizer', default='spacy', help='which tokenizing engine to use (from spaCy or pass a path to a Transformers tokenizer)')
     group.add_argument('-S', '--source_directory', help='directory with the subsets of a dataset to calculate token stats. The subsets must be grouped and stored in PolEval format')
