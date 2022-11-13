@@ -1,4 +1,6 @@
 from argparse import _MutuallyExclusiveGroup, _SubParsersAction
+
+from utils.data_preprocess import PROMPT_TARGETS
 from . import command
 
 __all__ = ['prepare_arg_parser', 'command']
@@ -21,4 +23,5 @@ def prepare_arg_parser(subparsers: _SubParsersAction):
     parser.add_argument('-o', '--original', action='store_true', help='include the original question and answer when downloading. By default they are not')
     parser.add_argument('--split', action='store_true', help='perform split on train/dev/test as 70/15/15')
     parser.add_argument('-e', '--engine', dest='tokenizer', default='spacy', help='used with -c flag. Tokenizer which is used to split dataset texts on tokens. Default is spaCy (case insensitive), but also can be passed a path to a Transformers tokenizer')
+    parser.add_argument('-w', '--which-to-prompt', choices=PROMPT_TARGETS, default=PROMPT_TARGETS[0], dest='prompt_target', help='used with -p flag. Specifies whether both questions and answers to prompt or one of them')
     return parser

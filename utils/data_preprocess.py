@@ -17,7 +17,7 @@ PL_QUESTION_PROMPTS = [
 PL_ANSWER_PROMPTS = [
     f'Odpowiedź na dane pytanie to: {PROMPT_PLACEHOLDER}.',
     f'Poprawna odpowiedź: {PROMPT_PLACEHOLDER}.',
-    f'Proszę podać odpowiedź. Odpowiedź na pytanie - {PROMPT_PLACEHOLDER}.',
+    f'Odpowiedź na pytanie - {PROMPT_PLACEHOLDER}.',
     f'Odpowiedzią na to pytanie jest: {PROMPT_PLACEHOLDER}.',
     f'Odpowiedź: {PROMPT_PLACEHOLDER}.'
 ]

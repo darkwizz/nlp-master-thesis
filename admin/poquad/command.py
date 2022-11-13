@@ -38,7 +38,7 @@ def read_poquad_data(base_directory, include_impossible):
 
 def main(args):
     from utils.workflow import save_data
-    from utils.data_preprocess import get_artificially_augmented_dataset
+    from utils.data_preprocess import get_artificially_augmented_dataset, get_prompt_augmented_dataset
 
     base_directory = args.directory
     data = read_poquad_data(base_directory, args.impossible)
@@ -55,6 +55,8 @@ def main(args):
     
     if args.artificial:
         data = get_artificially_augmented_dataset(data, QUESTION_FEATURE, ANSWER_FEATURE)
+    elif args.prompts:
+        data = get_prompt_augmented_dataset(data, QUESTION_FEATURE, ANSWER_FEATURE, prompt_target=args.prompt_target, seed=args.seed)
     
     target_path = args.target_path
     save_data(data, target_path)

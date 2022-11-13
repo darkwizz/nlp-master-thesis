@@ -1,7 +1,7 @@
 import os
 from admin import ANSWER_FEATURE, QUESTION_FEATURE
 
-from utils.data_preprocess import get_artificially_augmented_dataset
+from utils.data_preprocess import get_artificially_augmented_dataset, get_prompt_augmented_dataset
 
 
 def print_number_of_tokens(data, tokenizer):
@@ -36,6 +36,8 @@ def main(args):
     
     if args.artificial:
         data = get_artificially_augmented_dataset(data, QUESTION_FEATURE, ANSWER_FEATURE)
+    elif args.prompts:
+        data = get_prompt_augmented_dataset(data, QUESTION_FEATURE, ANSWER_FEATURE, prompt_target=args.prompt_target, seed=args.seed)
     
     print('Saving MKQA as CSV...')
     if args.download:
