@@ -18,7 +18,7 @@ PL_QUESTION_PROMPTS = {
 PL_ANSWER_PROMPTS = [
     'Odpowiedź na dane pytanie to |&|',
     'Poprawna odpowiedź: |&|',
-    'Proszę podać odpowiedź: |&|',
+    'Proszę podać odpowiedź: odpowiedź to |&|',
     'Odpowiedzią na to pytanie jest |&|'
 ]
 
@@ -69,14 +69,16 @@ def get_artificially_augmented_answer(answer, prefix=ANSWER_PREFIX, suffix=ANSWE
     return f'{prefix}{answer}{suffix}'
 
 
-def _get_item_preprocessor(question_feature, question_processor, answer_feature, answer_processor):
+def _get_item_preprocessor(question_feature, question_processor, answer_feature, answer_processor, \
+                            question_prefix=QUESTION_PREFIX, question_suffix=QUESTION_SUFFIX, \
+                            answer_prefix=ANSWER_PREFIX, answer_suffix=ANSWER_SUFFIX):
     def item_preprocessor(item):
         result = {}
         for key in item:
             if key == question_feature:
-                result[key] = question_processor(item[key])
+                result[key] = question_processor(item[key], prefix=question_prefix, suffix=question_suffix)
             elif key == answer_feature:
-                result[key] = answer_processor(item[key])
+                result[key] = answer_processor(item[key], prefix=answer_prefix, suffix=answer_suffix)
             else:
                 result[key] = item[key]
         return result
@@ -88,3 +90,8 @@ def get_artificially_augmented_dataset(dataset, question_feature='question', ans
     preprocessor = _get_item_preprocessor(question_feature, get_artificially_augmented_question, answer_feature, get_artificially_augmented_answer)
     result = dataset.map(lambda item: preprocessor(item))
     return result
+
+
+@info_message('Prepending questions and answers by a natural prompt')
+def get_prompt_augmented_dataset(dataset, question_feature='question', answer_feature='answer', seed=2327):
+    return dataset

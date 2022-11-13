@@ -109,3 +109,19 @@ def perform_artificial_augmentation(source_path, target_path):
     
     print('Saving augmented data...')
     save_data(data, target_path)
+
+
+def perform_prompt_augmentation(source_path, target_path, seed=5115):
+    from utils.data_preprocess import get_prompt_augmented_dataset
+    from utils.workflow import load_data_for_split, save_data
+
+    data = {}
+    print('Loading data...')
+    for subset in os.listdir(source_path):
+        dataset = load_data_for_split(os.path.join(source_path, subset, 'in.tsv'), QUESTION_FEATURE,
+                                        os.path.join(source_path, subset, 'expected.tsv'), ANSWER_FEATURE)
+        augmented_dataset = get_prompt_augmented_dataset(dataset, seed)
+        data[subset] = augmented_dataset
+    
+    print('Saving augmented data...')
+    save_data(data, target_path)
