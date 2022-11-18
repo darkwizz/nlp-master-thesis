@@ -116,10 +116,11 @@ def fill_subset_from_buffer(result_subset, buffer):
                 'question': qa['question'],
                 'answer': qa['answer'],
                 'title': buf_item['title'],
-                'en_label': buf_item['en_label'],
-                'pl_label': buf_item['pl_label'],
-                'description': buf_item['description'],
-                'is_impossible': qa['is_impossible']
+                'en_label': buf_item.get('en_label', None),
+                'pl_label': buf_item.get('pl_label', None),
+                'description': buf_item.get('description', None),
+                'is_impossible': qa['is_impossible'],
+                'title_id': buf_item.get('title_id', None)
             }
             result_subset.append(result_item)
 
