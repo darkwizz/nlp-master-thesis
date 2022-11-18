@@ -47,7 +47,7 @@ pandas==1.4.2
 pandas-stubs==1.4.3.220710
 pathy==0.6.2
 pep517==0.8.2
-Pillow==9.2.0
+Pillow>=9.3.0
 pkg_resources==0.0.0
 pl-core-news-lg==3.4.0
 preshed==3.0.6
