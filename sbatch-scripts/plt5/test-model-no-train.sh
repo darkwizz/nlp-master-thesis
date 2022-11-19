@@ -8,8 +8,9 @@
 #SBATCH --mem 32GB
 #SBATCH -t 00:10:00
 
-module load python/3.8.6-gcccore-10.2.0
+module load python/3.9.6-gcccore-11.2.0
 module load cuda/11.6.0
+module load cudnn/8.4.1.50-cuda-11.6.0
 source $SCRATCH/venv/bin/activate
 cd $SCRATCH/t5-gpt2-scripts
 export TRANSFORMERS_CACHE="$SCRATCH/transformers-cache"
