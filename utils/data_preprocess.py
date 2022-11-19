@@ -107,6 +107,7 @@ def get_prompt_augmented_dataset(dataset, question_feature='question', answer_fe
     return result
 
 
+@info_message('Prompting questions based on their category')
 def get_special_prompt_augmented_dataset(dataset, prompt_group_selector: Callable[[Any], List], question_feature='question', answer_feature='answer', prompt_target=PROMPT_TARGETS[0], seed=2239):
     if prompt_target == PROMPT_TARGETS[2]:
         return get_prompt_augmented_dataset(dataset, question_feature, answer_feature, prompt_target, seed)

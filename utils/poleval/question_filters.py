@@ -18,7 +18,7 @@ def multiple_choice_filter(data_item):
     return ' czy ' in data_item['question']
 
 
-def person_entity_filter(data_item):  # TODO: change 'living' (e.g. person)
+def person_entity_filter(data_item):
     return data_item['question'].startswith('Kto ') or ' kto jest' in data_item['question']
 
 
