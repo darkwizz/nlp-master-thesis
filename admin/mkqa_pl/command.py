@@ -1,7 +1,7 @@
 import os
 from admin import ANSWER_FEATURE, QUESTION_FEATURE
 
-from utils.data_preprocess import get_artificially_augmented_dataset, get_prompt_augmented_dataset
+from utils.data_preprocess import get_artificially_augmented_dataset, get_prompt_augmented_dataset, get_special_prompt_augmented_dataset, PL_QUESTION_PROMPTS
 
 
 def load_mkqa_subset(base_dir):
@@ -38,6 +38,13 @@ def print_number_of_tokens(data, tokenizer):
     print(f'Number of tokens in the downloaded MKQA dataset: {total_n_tokens}')
 
 
+def get_prompts_for_question(item):
+    from utils.mkqa_pl.prompting import MKQA_QUESTION_PROMPTS
+
+    answer_type = item.get('answer_type', 'unknown')
+    return MKQA_QUESTION_PROMPTS.get(answer_type, PL_QUESTION_PROMPTS)
+
+
 def main(args):
     from utils import compose_subsets_paths
     from utils.mkqa_pl import download_pl_subset, save_dataset
@@ -66,6 +73,8 @@ def main(args):
         data = get_artificially_augmented_dataset(data, QUESTION_FEATURE, ANSWER_FEATURE)
     elif args.prompts:
         data = get_prompt_augmented_dataset(data, QUESTION_FEATURE, ANSWER_FEATURE, prompt_target=args.prompt_target, seed=args.seed)
+    elif args.gprompts:
+        data = get_special_prompt_augmented_dataset(data, get_prompts_for_question, QUESTION_FEATURE, ANSWER_FEATURE, prompt_target=args.prompt_target, seed=args.seed)
     
     print('Saving MKQA as CSV...')
     if args.download:

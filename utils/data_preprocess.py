@@ -1,3 +1,4 @@
+from typing import Any, Callable, Dict, List
 import numpy as np
 
 from utils.workflow import info_message
@@ -102,5 +103,30 @@ def get_prompt_augmented_dataset(dataset, question_feature='question', answer_fe
     elif prompt_target == PROMPT_TARGETS[2]:
         question_prompt_processor = lambda item: item
     preprocessor = _get_item_preprocessor(question_feature, question_prompt_processor, answer_feature, answer_prompt_processor)
+    result = dataset.map(lambda item: preprocessor(item))
+    return result
+
+
+def get_special_prompt_augmented_dataset(dataset, prompt_group_selector: Callable[[Any], List], question_feature='question', answer_feature='answer', prompt_target=PROMPT_TARGETS[0], seed=2239):
+    if prompt_target == PROMPT_TARGETS[2]:
+        return get_prompt_augmented_dataset(dataset, question_feature, answer_feature, prompt_target, seed)
+
+    rs = np.random.RandomState(seed=seed)
+    answer_prompt_processor = lambda answer: get_prompt_augmented_answer(answer, PL_ANSWER_PROMPTS, rs=rs)
+    if prompt_target == PROMPT_TARGETS[1]:
+        answer_prompt_processor = lambda item: item
+    
+    def preprocessor(item):
+        question_prompts = prompt_group_selector(item)
+        result = {}
+        for key in item:
+            if key == question_feature:
+                result[key] = get_prompt_augmented_question(item[key], question_prompts, rs=rs)
+            elif key == answer_feature:
+                result[key] = answer_prompt_processor(item[key])
+            else:
+                result[key] = item[key]
+        return result
+    
     result = dataset.map(lambda item: preprocessor(item))
     return result
