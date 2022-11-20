@@ -1,5 +1,16 @@
 from argparse import ArgumentParser
 from importlib import import_module
+import os
+from time import time
+from datetime import timedelta
+
+
+def write_elapsed_time(elapsed_time, parsed_args):
+    finish_time_str = f'Elapsed time: {timedelta(seconds=elapsed_time)}'
+    file_path = os.path.join(parsed_args.results_dir, 'elapsed.log')
+    with open(file_path, 'w') as elapsed_file:
+        elapsed_file.write(finish_time_str)
+    print(finish_time_str)
 
 
 def main(parsed_args):
@@ -7,7 +18,10 @@ def main(parsed_args):
     revision = parsed_args.revision
     module_name = f'{model_name}.{revision}.train'
     module = import_module(module_name)
+    start = time()
     module.main(parsed_args)
+    end = time()
+    write_elapsed_time(end - start, parsed_args)
 
 
 if __name__ == '__main__':
