@@ -1,6 +1,6 @@
 import os
 import torch
-from transformers import AutoTokenizer, AutoModelWithLMHead, DataCollatorForLanguageModeling, Trainer, pipeline
+from transformers import AutoTokenizer, AutoModelWithLMHead, DataCollatorForLanguageModeling, Trainer
 from papugapt2.utils import get_gpt2_tokenizer_function, EOS_TOKEN
 from utils.workflow import get_answered_questions, info_message, load_datasets, write_results_to_tsv
 
@@ -69,17 +69,18 @@ class PapuGaPT2Runner:
         trainer.train()
     
     def _get_questions_answer_retriever(self):
-        try:
-            gpt2_pipeline = pipeline('text-generation', model=self._model, tokenizer=self._tokenizer, device=self._device)
-        except TypeError:
-            device = self._device.index if self._device.index is not None else -1
-            gpt2_pipeline = pipeline('text-generation', model=self._model, tokenizer=self._tokenizer, device=device)
-
-        def get_answers(batch):
-            questions = batch['question']
-            answers = gpt2_pipeline(questions, max_new_tokens=self._test_max_len, return_full_text=False)
-            result = [item[0]['generated_text'] for item in answers]
-            return result
+        def get_answers(raw_batch):
+            batch = {
+                'input_ids': raw_batch['input_ids'],
+                'attention_mask': raw_batch['attention_mask']
+            }
+            if not self._test_max_len:
+                batch_outs = self.model.generate(**batch)
+            else:
+                batch_outs = self.model.generate(**batch, max_new_tokens=self._test_max_len)
+            batch_outs = batch_outs[:, batch['input_ids'].shape[1]:]
+            decoded = self.tokenizer.batch_decode(batch_outs, skip_special_tokens=True)
+            return decoded
         return get_answers
     
     @info_message('Testing model and writing results')
