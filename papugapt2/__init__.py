@@ -75,9 +75,9 @@ class PapuGaPT2Runner:
                 'attention_mask': raw_batch['attention_mask']
             }
             if not self._test_max_len:
-                batch_outs = self.model.generate(**batch)
+                batch_outs = self.model.generate(**batch, pad_token_id=self.tokenizer.eos_token_id)
             else:
-                batch_outs = self.model.generate(**batch, max_new_tokens=self._test_max_len)
+                batch_outs = self.model.generate(**batch, pad_token_id=self.tokenizer.eos_token_id, max_new_tokens=self._test_max_len)
             batch_outs = batch_outs[:, batch['input_ids'].shape[1]:]
             decoded = self.tokenizer.batch_decode(batch_outs, skip_special_tokens=True)
             return decoded
@@ -90,4 +90,7 @@ class PapuGaPT2Runner:
         
         test_feature_name = 'test' if 'answer' not in self.data['test'].features else 'test-no-ans'
         answers, questions, expected = get_answered_questions(self.data[test_feature_name], self._get_questions_answer_retriever(), self._test_batch_size)
+
+        if not expected and 'answer' in self.data['test'].features:
+            expected = self.data['test']['answer']
         write_results_to_tsv(self._results_base_path, questions, answers, expected)

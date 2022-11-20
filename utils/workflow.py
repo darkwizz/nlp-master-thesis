@@ -75,7 +75,7 @@ def load_data_for_split(questions_path, questions_feature_name, answers_path=Non
 
 def write_data_to_tsv(path, data):
     if not data:
-        print('[WARNING] No data passed')
+        print(f'[WARNING] No data passed to save under this path: {path}')
         return
     
     with open(path, 'w') as tsv_file:
@@ -97,11 +97,10 @@ def write_results_to_tsv(results_base_path, questions, answers, expected):
 
 @info_message('Testing model')
 def get_answered_questions(dataset, answer_retriever_func, batch_size=50):
-    start = 0
     outputs = []
     questions = []
     expected = []
-    while start < len(dataset['input_ids']):
+    for start in tqdm(range(0, len(dataset['input_ids']), batch_size)):
         end = start + batch_size
         batch = dataset[start:end]
         answers = answer_retriever_func(batch)
@@ -109,7 +108,6 @@ def get_answered_questions(dataset, answer_retriever_func, batch_size=50):
         questions.extend(dataset['question'][start:end])
         if 'answer' in dataset.features:
             expected.extend(dataset['answer'][start:end])
-        start = end
     return outputs, questions, expected
 
 
