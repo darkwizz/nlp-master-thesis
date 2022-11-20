@@ -1,7 +1,7 @@
 import os
 import torch
-from transformers import AutoTokenizer, AutoModelForMaskedLM, DataCollatorForLanguageModeling, Trainer
-from papugapt2.utils import get_gpt2_tokenizer_function
+from transformers import AutoTokenizer, AutoModelWithLMHead, DataCollatorForLanguageModeling, Trainer, pipeline
+from papugapt2.utils import get_gpt2_tokenizer_function, EOS_TOKEN
 from utils.workflow import get_answered_questions, info_message, load_datasets, write_results_to_tsv
 
 class PapuGaPT2Runner:
@@ -18,6 +18,7 @@ class PapuGaPT2Runner:
         self._data = None
         self._tokenizer = None
         self._model = None
+        self._device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     
     @property
     def data(self):
@@ -42,14 +43,14 @@ class PapuGaPT2Runner:
         if 'answer' in data['test'].features:
             data['test-no-ans'] = data['test'].remove_columns('answer')
         self._tokenizer = AutoTokenizer.from_pretrained(self._tokenizer_path)
+        self._tokenizer.eos_token = EOS_TOKEN
         self._tokenizer.pad_token = self._tokenizer.eos_token
         self._data = data.map(get_gpt2_tokenizer_function(self._tokenizer, self._q_maxlen, self._a_maxlen), batched=self._batched)
-        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-        self._data.set_format("pt", columns=["input_ids", 'attention_mask'], device=device, output_all_columns=True)
+        self._data.set_format("pt", columns=["input_ids", 'attention_mask'], device=self._device, output_all_columns=True)
     
     @info_message('Preparing model')
     def prepare_model(self):
-        self._model = AutoModelForMaskedLM.from_pretrained(self._model_path)
+        self._model = AutoModelWithLMHead.from_pretrained(self._model_path).to(self._device)
     
     @info_message('Training')
     def train(self, training_args):
@@ -67,20 +68,25 @@ class PapuGaPT2Runner:
         )
         trainer.train()
     
+    def _get_questions_answer_retriever(self):
+        try:
+            gpt2_pipeline = pipeline('text-generation', model=self._model, tokenizer=self._tokenizer, device=self._device)
+        except TypeError:
+            device = self._device.index if self._device.index is not None else -1
+            gpt2_pipeline = pipeline('text-generation', model=self._model, tokenizer=self._tokenizer, device=device)
+
+        def get_answers(batch):
+            questions = batch['question']
+            answers = gpt2_pipeline(questions, max_new_tokens=self._test_max_len, return_full_text=False)
+            result = [item[0]['generated_text'] for item in answers]
+            return result
+        return get_answers
+    
     @info_message('Testing model and writing results')
     def test(self):
         if not all([self._data, self._model, self._tokenizer]):
             raise ValueError('Model and data must be prepared')
         
         test_feature_name = 'test' if 'answer' not in self.data['test'].features else 'test-no-ans'
-        answers, questions, expected = get_answered_questions(self.data[test_feature_name], self.model, self.tokenizer, self._test_batch_size, self._test_max_len)
-
-        formatted_answers = []
-        for generated in answers:
-            answer = generated.split('Odpowiedź: ')[1]
-            formatted_answers.append(answer)
-        answers = formatted_answers
-
-        if not expected:
-            expected = self.data['test']['answer']
+        answers, questions, expected = get_answered_questions(self.data[test_feature_name], self._get_questions_answer_retriever(), self._test_batch_size)
         write_results_to_tsv(self._results_base_path, questions, answers, expected)

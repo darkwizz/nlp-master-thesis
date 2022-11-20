@@ -20,6 +20,7 @@ class PlT5Runner:
         self._tokenizer = None
         self._data = None
         self._model = None
+        self._device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     
     @property
     def data(self):
@@ -43,12 +44,11 @@ class PlT5Runner:
         data = load_datasets(**data_files)
         self._tokenizer = AutoTokenizer.from_pretrained(self._tokenizer_path)
         self._data = data.map(get_t5_tokenizer_function(self._tokenizer, self._q_maxlen, self._a_maxlen), batched=self._batched)
-        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-        self._data.set_format("pt", columns=["input_ids", 'attention_mask'], device=device, output_all_columns=True)
+        self._data.set_format("pt", columns=["input_ids", 'attention_mask'], device=self._device, output_all_columns=True)
     
     @info_message('Preparing model')
     def prepare_model(self):
-        self._model = T5ForConditionalGeneration.from_pretrained(self._model_path)
+        self._model = T5ForConditionalGeneration.from_pretrained(self._model_path).to(self._device)
     
     @info_message('Training')
     def train(self, training_args):
@@ -66,10 +66,24 @@ class PlT5Runner:
         )
         trainer.train()
     
+    def _get_questions_answer_retriever(self):
+        def get_answers(raw_batch):
+            batch = {
+                'input_ids': raw_batch['input_ids'],
+                'attention_mask': raw_batch['attention_mask']
+            }
+            if not self._test_max_len:
+                batch_outs = self.model.generate(**batch)
+            else:
+                batch_outs = self.model.generate(**batch, max_new_tokens=self._test_max_len)
+            decoded = self.tokenizer.batch_decode(batch_outs, skip_special_tokens=True)
+            return decoded
+        return get_answers
+    
     @info_message('Testing model and writing results')
     def test(self):
         if not all([self._data, self._model, self._tokenizer]):
             raise ValueError('Model and data must be prepared')
 
-        answers, questions, expected = get_answered_questions(self.data['test'], self.model, self.tokenizer, self._test_batch_size, self._test_max_len)
+        answers, questions, expected = get_answered_questions(self.data['test'], self._get_questions_answer_retriever(), self._test_batch_size)
         write_results_to_tsv(self._results_base_path, questions, answers, expected)
