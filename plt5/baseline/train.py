@@ -32,7 +32,8 @@ def main(parsed_args):
         )
         t5_runner.train(training_args)
     
-    t5_runner.test()
-
     if parsed_args.save_pretrained:
         save_trained_model(parsed_args, t5_runner.model)
+    
+    t5_runner.test()
+

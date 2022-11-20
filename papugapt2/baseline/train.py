@@ -30,8 +30,8 @@ def main(parsed_args):
             output_dir=parsed_args.training_output_dir,
             overwrite_output_dir=True,
             evaluation_strategy='steps',
-            per_device_train_batch_size=64,
-            per_device_eval_batch_size=64,
+            per_device_train_batch_size=16,
+            per_device_eval_batch_size=16,
             eval_steps=100,
             do_train=True,
             do_eval=True,
@@ -40,13 +40,13 @@ def main(parsed_args):
             gradient_accumulation_steps=1,
             weight_decay=0.01,
             save_total_limit=3,
-            num_train_epochs=10,
+            num_train_epochs=20,
             seed=parsed_args.seed
         )
         papugapt2_runner.train(training_args)
     
-    papugapt2_runner.test()
-    # answers, questions, expected = test_model_few_shot(parsed_args, model, tokenizer, tokenized_data['test'])
-
     if parsed_args.save_pretrained:
         save_trained_model(parsed_args, papugapt2_runner.model)
+    
+    papugapt2_runner.test()
+    # answers, questions, expected = test_model_few_shot(parsed_args, model, tokenizer, tokenized_data['test'])

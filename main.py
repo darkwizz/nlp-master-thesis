@@ -6,8 +6,10 @@ from datetime import timedelta
 
 
 def write_elapsed_time(elapsed_time, parsed_args):
+    elapsed_dir_base_path = os.path.join(os.getcwd(), 'elapsed-results')
+    os.makedirs(elapsed_dir_base_path, exist_ok=True)
     finish_time_str = f'Elapsed time: {timedelta(seconds=elapsed_time)}'
-    file_path = os.path.join(parsed_args.results_dir, 'elapsed.log')
+    file_path = os.path.join(elapsed_dir_base_path, f'{parsed_args.results_dir}-elapsed.log')
     with open(file_path, 'w') as elapsed_file:
         elapsed_file.write(finish_time_str)
     print(finish_time_str)
