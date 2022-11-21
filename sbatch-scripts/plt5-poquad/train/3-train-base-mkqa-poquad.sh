@@ -15,4 +15,4 @@ source $SCRATCH/venv/bin/activate
 cd $SCRATCH/t5-gpt2-scripts
 export TRANSFORMERS_CACHE="$SCRATCH/transformers-cache"
 
-python main.py -n plt5 -r baseline -b ./data-iterations/3-base-mkqa-poquad -t azwierzc/plt5-large-poquad -m azwierzc/plt5-large-poquad --results-dir ./3-plt5-poquad-results --save-pretrained -q "45" -a "150" --test-max-length "150" --test-batch-size "256" -M ./plt5-poquad/baseline/3-trained-model
+python main.py -n plt5 -r baseline -b ./data-iterations/3-base-mkqa-poquad -t azwierzc/plt5-large-poquad -m azwierzc/plt5-large-poquad --results-dir ./3-plt5-poquad-results --save-pretrained -q "45" -a "150" --test-max-length "150" --test-batch-size "256" -M ./plt5-poquad/baseline/3-trained-model -o ./training-log/3-plt-poquad
