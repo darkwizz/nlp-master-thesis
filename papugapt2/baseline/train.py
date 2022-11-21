@@ -40,7 +40,7 @@ def main(parsed_args):
             gradient_accumulation_steps=1,
             weight_decay=0.01,
             save_total_limit=3,
-            num_train_epochs=20,
+            num_train_epochs=30,
             seed=parsed_args.seed
         )
         papugapt2_runner.train(training_args)
