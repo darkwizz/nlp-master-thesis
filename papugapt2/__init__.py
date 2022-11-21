@@ -55,6 +55,7 @@ class PapuGaPT2Runner:
         
         self._model = AutoModelWithLMHead.from_pretrained(self._model_path).to(self._device)
         self._model.resize_token_embeddings(len(self._tokenizer))
+        self._model.tie_weights()
     
     @info_message('Training')
     def train(self, training_args):
