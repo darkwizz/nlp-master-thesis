@@ -42,7 +42,7 @@ class PapuGaPT2Runner:
         data = load_datasets(**data_files)
         if 'answer' in data['test'].features:
             data['test-no-ans'] = data['test'].remove_columns('answer')
-        self._tokenizer = AutoTokenizer.from_pretrained(self._tokenizer_path)
+        self._tokenizer = AutoTokenizer.from_pretrained(self._tokenizer_path, padding_side='left')
         self._tokenizer.eos_token = EOS_TOKEN
         self._tokenizer.pad_token = self._tokenizer.eos_token
         self._data = data.map(get_gpt2_tokenizer_function(self._tokenizer, self._q_maxlen, self._a_maxlen), batched=self._batched)
@@ -50,7 +50,11 @@ class PapuGaPT2Runner:
     
     @info_message('Preparing model')
     def prepare_model(self):
+        if not self._tokenizer:
+            raise ValueError('For papuGaPT2 tokenizer must be initialized before the model')
+        
         self._model = AutoModelWithLMHead.from_pretrained(self._model_path).to(self._device)
+        self._model.resize_token_embeddings(len(self._tokenizer))
     
     @info_message('Training')
     def train(self, training_args):
