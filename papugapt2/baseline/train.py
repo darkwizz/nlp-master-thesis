@@ -35,7 +35,7 @@ def main(parsed_args):
             eval_steps=100,
             do_train=True,
             do_eval=True,
-            learning_rate=1e-3,
+            learning_rate=5e-6,
             warmup_steps=1000,
             gradient_accumulation_steps=1,
             weight_decay=0.01,
