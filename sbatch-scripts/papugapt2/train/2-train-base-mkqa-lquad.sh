@@ -15,4 +15,4 @@ source $SCRATCH/venv/bin/activate
 cd $SCRATCH/t5-gpt2-scripts
 export TRANSFORMERS_CACHE="$SCRATCH/transformers-cache"
 
-python main.py -n papugapt2 -r baseline -b ./data-iterations/2-base-mkqa-lquad -t flax-community/papuGaPT2-large -m flax-community/papuGaPT2-large --results-dir ./2-papugapt2-large-results --save-pretrained -q "46" -a "30" --test-max-length "16" -M ./papugapt2-large-checkpoints/baseline/2-trained-model --test-batch-size 256 -o ./training-log/2-papugapt2
+python main.py -n papugapt2 -r baseline -b ./data-iterations/2-base-mkqa-lquad -t flax-community/papuGaPT2-large -m flax-community/papuGaPT2-large --results-dir ./2-papugapt2-large-results --save-pretrained -q "86" -a "88" --test-max-length "16" -M ./papugapt2-large-checkpoints/baseline/2-trained-model --test-batch-size 256 -o ./training-log/2-papugapt2

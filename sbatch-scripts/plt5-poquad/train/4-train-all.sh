@@ -6,7 +6,7 @@
 #SBATCH -n 1
 #SBATCH --ntasks-per-node 1
 #SBATCH --mem 32GB
-#SBATCH -t 16:00:00
+#SBATCH -t 24:00:00
 
 module load python/3.9.6-gcccore-11.2.0
 module load cuda/11.6.0

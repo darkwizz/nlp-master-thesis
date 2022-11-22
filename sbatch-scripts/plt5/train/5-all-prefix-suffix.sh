@@ -15,4 +15,4 @@ source $SCRATCH/venv/bin/activate
 cd $SCRATCH/t5-gpt2-scripts
 export TRANSFORMERS_CACHE="$SCRATCH/transformers-cache"
 
-python main.py -n plt5 -r baseline -b ./data-iterations/3-base-mkqa-poquad -t allegro/plt5-large -m allegro/plt5-large --results-dir ./3-plt5-large-results --save-pretrained -q "45" -a "150" --test-max-length "16" --test-batch-size "256" -M ./plt5-large-checkpoints/baseline/3-trained-model -o ./training-log/3-plt-large
+python main.py -n plt5 -r baseline -b ./data-iterations/5-all-prefix-suffix -t allegro/plt5-large -m allegro/plt5-large --results-dir ./5-plt5-large-results --save-pretrained -q "115" -a "160" --test-max-length "30" --test-batch-size "256" -M ./plt5-large-checkpoints/baseline/5-trained-model -o ./training-log/5-plt-large
