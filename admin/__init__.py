@@ -69,9 +69,13 @@ def get_dataset_stats(engine, dataset_path):
         in_path = os.path.join(dataset_path, subset, 'in.tsv')
         expected_path = os.path.join(dataset_path, subset, 'expected.tsv')
         dataset = load_data_for_split(in_path, 'question', expected_path, 'answer')
+        total_question_len = 0
+        total_answer_len = 0
         for item in tqdm(dataset):
             question_len = get_tokens_number(item[QUESTION_FEATURE])
+            total_question_len += question_len
             answer_len = get_tokens_number(item[ANSWER_FEATURE])
+            total_answer_len += answer_len
             result[subset]['question']['min'] = min(result[subset]['question']['min'], question_len)
             result[subset]['question']['max'] = max(result[subset]['question']['max'], question_len)
             result[subset]['answer']['min'] = min(result[subset]['answer']['min'], answer_len)
@@ -80,6 +84,9 @@ def get_dataset_stats(engine, dataset_path):
                 result[subset]['question']['longest'] = item[QUESTION_FEATURE]
             if result[subset]['answer']['max'] == answer_len:
                 result[subset]['answer']['longest'] = item[ANSWER_FEATURE]
+        result[subset]['question']['avg'] = total_question_len / len(dataset)
+        result[subset]['answer']['avg'] = total_answer_len / len(dataset)
+        result[subset]['total'] = total_answer_len + total_question_len
     return result
 
 
@@ -88,11 +95,11 @@ def print_subsets_stats(subsets_stats):
     print('Dataset stats')
     print('#' * 50)
     for subset in subsets_stats:
-        print(f'Subset: {subset}')
+        print(f'Subset: {subset}. Total number of tokens: {subsets_stats[subset]["total"]}')
         question_stats = subsets_stats[subset]['question']
         answer_stats = subsets_stats[subset]['answer']
-        print(f'Questions => min: {question_stats["min"]}, max: {question_stats["max"]}, longest question: {question_stats["longest"]}')
-        print(f'Answers => min: {answer_stats["min"]}, max: {answer_stats["max"]}, longest answer: {answer_stats["longest"]}')
+        print(f'Questions => min: {question_stats["min"]}, max: {question_stats["max"]}, avg: {question_stats["avg"]}, longest question: {question_stats["longest"]}')
+        print(f'Answers => min: {answer_stats["min"]}, max: {answer_stats["max"]}, avg: "{answer_stats["avg"]}, longest answer: {answer_stats["longest"]}')
 
 
 def perform_artificial_augmentation(source_path, target_path):
