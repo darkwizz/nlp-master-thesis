@@ -99,7 +99,7 @@ def print_subsets_stats(subsets_stats):
         question_stats = subsets_stats[subset]['question']
         answer_stats = subsets_stats[subset]['answer']
         print(f'Questions => min: {question_stats["min"]}, max: {question_stats["max"]}, avg: {question_stats["avg"]}, longest question: {question_stats["longest"]}')
-        print(f'Answers => min: {answer_stats["min"]}, max: {answer_stats["max"]}, avg: "{answer_stats["avg"]}, longest answer: {answer_stats["longest"]}')
+        print(f'Answers => min: {answer_stats["min"]}, max: {answer_stats["max"]}, avg: {answer_stats["avg"]}, longest answer: {answer_stats["longest"]}')
 
 
 def perform_artificial_augmentation(source_path, target_path):
