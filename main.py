@@ -39,6 +39,8 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--training-output-dir', default='./training-results', help='path to outputs during model training. Be careful, as the default path is one level up than models and their revisions, thus would be overwritten for every program run')
     parser.add_argument('--test-batch-size', default=50, type=int)
     parser.add_argument('--test-max-length', default=None, type=int, help='max length necessary to create a pytorch tensor during testing')
+    parser.add_argument('--train-batch', type=int, default=16, help='batch size during training')
+    parser.add_argument('--eval-batch', type=int, default=16, help='batch size during validation')
     parser.add_argument('--results-dir', default='data-results')
     parser.add_argument('-s', '--save-pretrained', action='store_true')
     parser.add_argument('-S', '--skip-training', action='store_true')
