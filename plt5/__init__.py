@@ -51,7 +51,7 @@ class PlT5Runner:
         self._model = T5ForConditionalGeneration.from_pretrained(self._model_path).to(self._device)
     
     @info_message('Training')
-    def train(self, training_args, compute_metrics=None):
+    def train(self, training_args, compute_metrics=None, callbacks=None):
         if not all([self._data, self._model, self._tokenizer]):
             raise ValueError('Model and data must be prepared')
         
@@ -63,7 +63,8 @@ class PlT5Runner:
             eval_dataset=self.data['dev'],
             tokenizer=self.tokenizer,
             data_collator=data_collator,
-            compute_metrics=compute_metrics
+            compute_metrics=compute_metrics,
+            callbacks=callbacks
         )
         trainer.train()
     

@@ -2,7 +2,7 @@ from plt5 import PlT5Runner
 from plt5.utils import get_t5_metric_eval_preprocess
 from utils.workflow import save_trained_model
 from utils.training import get_compute_metrics
-from transformers import Seq2SeqTrainingArguments
+from transformers import Seq2SeqTrainingArguments, EarlyStoppingCallback
 
 
 def main(parsed_args):
@@ -16,6 +16,7 @@ def main(parsed_args):
             output_dir=parsed_args.training_output_dir,
             evaluation_strategy='steps',
             eval_steps=150,
+            save_steps=450,
             learning_rate=3e-4,
             do_train=True,
             do_eval=True,
@@ -29,13 +30,16 @@ def main(parsed_args):
             weight_decay=0.01,
             save_total_limit=3,
             overwrite_output_dir=True,
+            load_best_model_at_end=True,
+            metric_for_best_model='loss',
+            greater_is_better=False,
             num_train_epochs=5,
             seed=parsed_args.seed,
             fp16=parsed_args.fp16
         )
         metric_eval_preprocess = get_t5_metric_eval_preprocess(t5_runner.tokenizer)
         compute_metrics = get_compute_metrics(t5_runner.tokenizer, expected_ids_preprocess=metric_eval_preprocess, exact_match='EM/Accuracy', google_bleu='GLEU')
-        t5_runner.train(training_args, compute_metrics)
+        t5_runner.train(training_args, compute_metrics, [EarlyStoppingCallback(early_stopping_patience=1, early_stopping_threshold=0.1)])
     
     if parsed_args.save_pretrained:
         save_trained_model(parsed_args, t5_runner.model)
