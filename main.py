@@ -41,7 +41,7 @@ if __name__ == '__main__':
     parser.add_argument('--test-max-length', default=None, type=int, help='max length necessary to create a pytorch tensor during testing')
     parser.add_argument('--train-batch', type=int, default=16, help='batch size during training')
     parser.add_argument('--eval-batch', type=int, default=16, help='batch size during validation')
-    parser.add_argument('--results-dir', default='data-results')
+    parser.add_argument('--results-dir', default='data-results', help='path to the directory where predicted data will be stored')
     parser.add_argument('-s', '--save-pretrained', action='store_true')
     parser.add_argument('-S', '--skip-training', action='store_true')
     parser.add_argument('--seed', type=int, default=32351, help='randomizing seed for training. Default is 32351')

@@ -6,7 +6,7 @@
 #SBATCH -n 1
 #SBATCH --ntasks-per-node 1
 #SBATCH --mem 32GB
-#SBATCH -t 24:00:00
+#SBATCH -t 00:40:00
 
 module load python/3.9.6-gcccore-11.2.0
 module load cuda/11.6.0
@@ -15,4 +15,4 @@ source $SCRATCH/venv/bin/activate
 cd $SCRATCH/t5-gpt2-scripts
 export TRANSFORMERS_CACHE="$SCRATCH/transformers-cache"
 
-python main.py -n papugapt2 -r baseline -b ./data-iterations/5-all-prefix-suffix -t flax-community/papuGaPT2-large -m flax-community/papuGaPT2-large --results-dir ./5-papugapt2-large-results --save-pretrained -q "96" -a "160" --test-max-length "26" -M ./papugapt2-large-checkpoints/baseline/5-trained-model --test-batch-size 256 -o ./training-log/5-papugapt2
+python main.py -n papugapt2 -r early_stopping -b ./data-iterations/5-all-prefix-suffix -t flax-community/papuGaPT2-large -m flax-community/papuGaPT2-large --results-dir ./5-papugapt2-large-results --save-pretrained -q "96" -a "160" --test-max-length "26" -M ./papugapt2-large-checkpoints/early_stopping/5-trained-model --test-batch-size 64 -o ./training-log/5-papugapt2 --fp16 --train-batch 8 --eval-batch 8
