@@ -1,5 +1,7 @@
 from plt5 import PlT5Runner
+from plt5.utils import get_t5_metric_eval_preprocess
 from utils.workflow import save_trained_model
+from utils.training import get_compute_metrics
 from transformers import Seq2SeqTrainingArguments
 
 
@@ -8,7 +10,7 @@ def main(parsed_args):
     t5_runner = PlT5Runner(parsed_args, results_base_path, True)
     t5_runner.prepare_data()
     t5_runner.prepare_model()
-    
+
     if not parsed_args.skip_training:
         training_args = Seq2SeqTrainingArguments(
             output_dir=parsed_args.training_output_dir,
@@ -28,10 +30,12 @@ def main(parsed_args):
             save_total_limit=3,
             overwrite_output_dir=True,
             num_train_epochs=5,
-            seed=parsed_args.seed,
-            fp16=True
+            seed=parsed_args.seed
+            # fp16=True
         )
-        t5_runner.train(training_args)
+        metric_eval_preprocess = get_t5_metric_eval_preprocess(t5_runner.tokenizer)
+        compute_metrics = get_compute_metrics(t5_runner.tokenizer, expected_ids_preprocess=metric_eval_preprocess, exact_match='EM/Accuracy', google_bleu='GLEU')
+        t5_runner.train(training_args, compute_metrics)
     
     if parsed_args.save_pretrained:
         save_trained_model(parsed_args, t5_runner.model)
