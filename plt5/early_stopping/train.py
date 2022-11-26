@@ -39,7 +39,7 @@ def main(parsed_args):
         )
         metric_eval_preprocess = get_t5_metric_eval_preprocess(t5_runner.tokenizer)
         compute_metrics = get_compute_metrics(t5_runner.tokenizer, expected_ids_preprocess=metric_eval_preprocess, exact_match='EM/Accuracy', google_bleu='GLEU')
-        t5_runner.train(training_args, compute_metrics, [EarlyStoppingCallback(early_stopping_patience=1, early_stopping_threshold=0.1)])
+        t5_runner.train(training_args, compute_metrics, [EarlyStoppingCallback(early_stopping_patience=parsed_args.patience, early_stopping_threshold=0.1)])
     
     if parsed_args.save_pretrained:
         save_trained_model(parsed_args, t5_runner.model)
