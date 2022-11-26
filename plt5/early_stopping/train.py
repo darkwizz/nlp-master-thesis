@@ -30,8 +30,8 @@ def main(parsed_args):
             save_total_limit=3,
             overwrite_output_dir=True,
             num_train_epochs=5,
-            seed=parsed_args.seed
-            # fp16=True
+            seed=parsed_args.seed,
+            fp16=parsed_args.fp16
         )
         metric_eval_preprocess = get_t5_metric_eval_preprocess(t5_runner.tokenizer)
         compute_metrics = get_compute_metrics(t5_runner.tokenizer, expected_ids_preprocess=metric_eval_preprocess, exact_match='EM/Accuracy', google_bleu='GLEU')

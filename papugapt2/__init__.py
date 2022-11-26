@@ -58,7 +58,7 @@ class PapuGaPT2Runner:
         self._model.tie_weights()
     
     @info_message('Training')
-    def train(self, training_args):
+    def train(self, training_args, compute_metrics=None):
         if not all([self._data, self._model, self._tokenizer]):
             raise ValueError('Model and data must be prepared')
         
@@ -69,7 +69,8 @@ class PapuGaPT2Runner:
             train_dataset=self.data['train'],
             eval_dataset=self.data['dev'],
             tokenizer=self.tokenizer,
-            data_collator=data_collator
+            data_collator=data_collator,
+            compute_metrics=compute_metrics
         )
         trainer.train()
     

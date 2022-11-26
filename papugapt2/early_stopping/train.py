@@ -1,7 +1,8 @@
 from papugapt2 import PapuGaPT2Runner
+from papugapt2.utils import get_gpt2_metric_eval_preprocess, metric_eval_preprocess
+from utils.training import get_compute_metrics
 from utils.workflow import save_trained_model
-from papugapt2.utils import get_divided_datasets, get_gpt2_few_shot_prompts, get_few_shot_answers
-from transformers import TrainingArguments, pipeline
+from transformers import TrainingArguments
 
 
 def main(parsed_args):
@@ -27,8 +28,10 @@ def main(parsed_args):
             save_total_limit=3,
             num_train_epochs=5,
             seed=parsed_args.seed,
-            fp16=True
+            fp16=parsed_args.fp16
         )
+        expected_preprocess = get_gpt2_metric_eval_preprocess(papugapt2_runner.tokenizer)
+        # compute_metrics = get_compute_metrics(papugapt2_runner.tokenizer, expected_ids_preprocess=expected_preprocess, predicted_ids_preprocess=metric_eval_preprocess, exact_match='EM/Accuracy', google_bleu='GLEU')
         papugapt2_runner.train(training_args)
     
     if parsed_args.save_pretrained:

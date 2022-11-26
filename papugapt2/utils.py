@@ -6,6 +6,26 @@ from utils.workflow import info_message
 EOS_TOKEN = '</s>'
 
 
+def softmax(arr):
+    denominator = np.exp(arr).sum(axis=-1)[:,:,None]
+    softed = np.exp(arr) / denominator
+    return softed
+
+
+def get_gpt2_metric_eval_preprocess(tokenizer):
+    def metric_eval_preprocess(expected_ids):
+        expected_ids[expected_ids < 0] = tokenizer.pad_token_id
+        return expected_ids
+    
+    return metric_eval_preprocess
+
+
+def metric_eval_preprocess(predicted_logits):
+    softed = softmax(predicted_logits)
+    token_ids = softed.argmax(axis=-1)
+    return token_ids
+
+
 def get_gpt2_tokenizer_function(tokenizer, max_question_len=45, max_answer_len=10):
     def tokenize(examples):
         if 'answer' in examples:

@@ -1,5 +1,5 @@
 
-def get_compute_metrics(tokenizer, expected_ids_preprocess=None, **metrics):
+def get_compute_metrics(tokenizer, expected_ids_preprocess=None, predicted_ids_preprocess=None, **metrics):
     import evaluate
 
     loaded_metrics = {}
@@ -11,6 +11,8 @@ def get_compute_metrics(tokenizer, expected_ids_preprocess=None, **metrics):
         if expected_ids_preprocess:
             expected_ids = expected_ids_preprocess(expected_ids)
         preds_ids = pred.predictions
+        if predicted_ids_preprocess:
+            preds_ids = predicted_ids_preprocess(preds_ids)
         expected = tokenizer.batch_decode(expected_ids, skip_special_tokens=True)
         predicted = tokenizer.batch_decode(preds_ids, skip_special_tokens=True)
         metric_results = {}
