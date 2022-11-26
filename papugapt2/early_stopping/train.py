@@ -34,9 +34,9 @@ def main(parsed_args):
             metric_for_best_model='loss',
             greater_is_better=False
         )
-        expected_preprocess = get_gpt2_metric_eval_preprocess(papugapt2_runner.tokenizer)
+        # expected_preprocess = get_gpt2_metric_eval_preprocess(papugapt2_runner.tokenizer)
         # compute_metrics = get_compute_metrics(papugapt2_runner.tokenizer, expected_ids_preprocess=expected_preprocess, predicted_ids_preprocess=metric_eval_preprocess, exact_match='EM/Accuracy', google_bleu='GLEU')
-        papugapt2_runner.train(training_args, callbacks=[EarlyStoppingCallback(early_stopping_patience=1, early_stopping_threshold=0.1)])
+        papugapt2_runner.train(training_args, callbacks=[EarlyStoppingCallback(early_stopping_patience=parsed_args.patience, early_stopping_threshold=0.1)])
     
     if parsed_args.save_pretrained:
         save_trained_model(parsed_args, papugapt2_runner.model)
