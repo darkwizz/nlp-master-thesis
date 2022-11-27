@@ -29,6 +29,16 @@ def plot_questions_distribution_into_file(grouped_questions, question_types, fil
     bp.get_figure().savefig(file_path, bbox_inches='tight')
 
 
+def split_dataset_by_filters(data, **filters):
+    result = {}
+    remaining = data
+    for key, filter_func in filters.items():
+        result[key] = remaining.filter(filter_func)
+        remaining = remaining.filter(lambda item: not filter_func(item))
+    result['rest'] = remaining
+    return result
+
+
 def get_number_of_tokens_in_txt_spacy(nlp, text):
     return len(nlp(text))
 

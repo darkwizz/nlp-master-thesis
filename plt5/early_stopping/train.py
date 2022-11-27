@@ -37,6 +37,7 @@ def main(parsed_args):
             seed=parsed_args.seed,
             fp16=parsed_args.fp16
         )
+        # Observation: enabling fp16 for plT5 breaks training (eval_loss becomes `nan`)
         metric_eval_preprocess = get_t5_metric_eval_preprocess(t5_runner.tokenizer)
         compute_metrics = get_compute_metrics(t5_runner.tokenizer, expected_ids_preprocess=metric_eval_preprocess, exact_match='EM/Accuracy', google_bleu='GLEU')
         t5_runner.train(training_args, compute_metrics, [EarlyStoppingCallback(early_stopping_patience=parsed_args.patience, early_stopping_threshold=0.1)])

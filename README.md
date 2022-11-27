@@ -8,16 +8,17 @@ Artur Sokol
 ## Table of contents
 
 1. [About Closed-book QA](#briefly-about-the-problem)
-2. [How to use the main script](#main-script)
+2. [Structure of this repo](#repo-structure)
+3. [How to use the main script](#main-script)
     1. [General help](#general-help)
     2. [Environment setup notes](#note-about-the-environment)
     3. [Main script usage examples](#examples)
     4. [Results](#results)
     5. [Evaluation](#evaluation)
-3. [Utilities](#utilities)
+4. [Utilities](#utilities)
     1. [Custom PolEval filters](#grouping-poleval-questions-using-filters)
     2. [Administration commands](#admin-commands)
-4. [Experiments iterations](#experiments-iterations)
+5. [Experiments iterations](#experiments-iterations)
     1. [#0: baseline (PolEval only)](#iteration-0)
     2. [#1: PolEval + MKQA](#iteration-1)
     3. [#2: PolEval + MKQA + Law questions](#iteration-2)
@@ -38,6 +39,8 @@ Closed-book Question Answering means that a trained model in order to answer on 
 
 On the contrary, Open-book QA uses an external source of knowledge (e.g. a DB of Wikipedia articles in raw format). In this case an Open-book QA model searches for _k_ best matching documents and then uses MRC to extract the answer
 
+## Repo structure
+[TODO]
 
 ## Main script
 
