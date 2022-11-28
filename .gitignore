@@ -132,7 +132,6 @@ dmypy.json
 # other stuff
 *results*/
 .vscode
-run-gpt3-demo.sh
 .to-send
 lquad*
 *data*
@@ -141,3 +140,4 @@ tmp/
 augmented/
 *tmp*
 datasets-extra-info/
+/*.sh
